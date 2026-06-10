@@ -620,17 +620,17 @@ async function loadLesson(type, force=false){
 - 最後加「今日練習」一個簡單的練習題目`
   };
   try{
-    const resp=await fetch('https://api.anthropic.com/v1/messages',{
+    const GEMINI_KEY='AIzaSyAQ.Ab8RN6LXkpfcjQtAyNJEeOjanINoJ_zUCc5xuA4Hr5s8TGBAwA';
+    const resp=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_KEY}`,{
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify({
-        model:'claude-sonnet-4-20250514',
-        max_tokens:1000,
-        messages:[{role:'user',content:prompts[type]}]
+        contents:[{parts:[{text:prompts[type]}]}],
+        generationConfig:{maxOutputTokens:1000,temperature:0.9}
       })
     });
     const data=await resp.json();
-    const text=data.content?.map(i=>i.text||'').join('')||'';
+    const text=data.candidates?.[0]?.content?.parts?.[0]?.text||'';
     if(text){
       contentEl.innerHTML=text;
       const c=getLessonCache(); c[cacheKey]=text; setLessonCache(c);
