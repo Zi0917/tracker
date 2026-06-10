@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>166天衝刺計劃</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#0e0e12;--bg2:#15151c;--bg3:#1c1c26;--bg4:#242430;
+  --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.12);
+  --purple:#9b87f5;--purple2:#7c6de0;--purple-dim:rgba(155,135,245,0.15);
+  --text:#e8e6f0;--text2:#9994b0;--text3:#5a5670;
+  --green:#4ade80;--green-dim:rgba(74,222,128,0.12);
+  --amber:#fbbf24;--amber-dim:rgba(251,191,36,0.12);
+  --coral:#f87171;--teal:#34d399;
+  --radius:12px;--radius-sm:8px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;}
+::-webkit-scrollbar{width:4px;}::-webkit-scrollbar-track{background:var(--bg);}::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:2px;}
+.app{display:flex;min-height:100vh;}
+.sidebar{width:220px;flex-shrink:0;background:var(--bg2);border-right:1px solid var(--border);padding:24px 0;position:fixed;top:0;left:0;height:100vh;overflow-y:auto;z-index:100;transition:transform 0.3s;display:flex;flex-direction:column;}
+.sidebar-logo{padding:0 20px 24px;border-bottom:1px solid var(--border);margin-bottom:16px;}
+.sidebar-logo .logo-title{font-family:'Space Mono',monospace;font-size:13px;font-weight:700;color:var(--purple);letter-spacing:0.05em;}
+.sidebar-logo .logo-sub{font-size:11px;color:var(--text3);margin-top:3px;}
+.nav-section{padding:0 12px;margin-bottom:8px;}
+.nav-label{font-size:10px;font-weight:700;letter-spacing:0.1em;color:var(--text3);padding:0 8px;margin-bottom:4px;text-transform:uppercase;}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:var(--radius-sm);font-size:13px;color:var(--text2);cursor:pointer;transition:all 0.15s;border:1px solid transparent;}
+.nav-item:hover{background:var(--bg3);color:var(--text);}
+.nav-item.active{background:var(--purple-dim);color:var(--purple);border-color:rgba(155,135,245,0.2);}
+.nav-icon{font-size:16px;width:20px;text-align:center;}
+.sidebar-bottom{margin-top:auto;padding:16px 20px;border-top:1px solid var(--border);}
+.concert-countdown{text-align:center;}
+.countdown-num{font-family:'Space Mono',monospace;font-size:26px;font-weight:700;color:var(--purple);}
+.countdown-label{font-size:10px;color:var(--text3);margin-top:2px;}
+.main{margin-left:220px;flex:1;padding:32px;max-width:960px;}
+.page{display:none;}.page.active{display:block;}
+.page-header{margin-bottom:28px;}
+.page-title{font-size:22px;font-weight:700;color:var(--text);}
+.page-sub{font-size:13px;color:var(--text2);margin-top:4px;}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:16px;}
+.card-title{font-size:13px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:16px;}
+.today-date{font-family:'Space Mono',monospace;font-size:28px;font-weight:700;color:var(--purple);margin-bottom:4px;}
+.today-day{font-size:13px;color:var(--text3);margin-bottom:24px;}
+.checklist{display:flex;flex-direction:column;gap:8px;}
+.check-item{display:flex;align-items:center;gap:14px;padding:14px 16px;background:var(--bg3);border-radius:var(--radius-sm);border:1px solid var(--border);cursor:pointer;transition:all 0.2s;user-select:none;}
+.check-item:hover{border-color:var(--border2);}
+.check-item.done{border-color:rgba(155,135,245,0.25);}
+.check-item.done .check-label{color:var(--text3);text-decoration:line-through;}
+.check-box{width:22px;height:22px;border-radius:6px;border:2px solid var(--text3);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all 0.2s;}
+.check-item.done .check-box{background:var(--purple);border-color:var(--purple);}
+.check-tick{color:#fff;font-size:13px;display:none;}
+.check-item.done .check-tick{display:block;}
+.check-label{font-size:14px;color:var(--text);flex:1;}
+.check-time{font-size:11px;color:var(--text3);white-space:nowrap;font-family:'Space Mono',monospace;}
+.check-tag{font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px;letter-spacing:0.05em;}
+.tag-korean{background:var(--purple-dim);color:var(--purple);}
+.tag-invest{background:var(--amber-dim);color:var(--amber);}
+.tag-exercise{background:var(--green-dim);color:var(--green);}
+.tag-dance{background:rgba(248,113,113,0.12);color:var(--coral);}
+.tag-fans{background:rgba(52,211,153,0.12);color:var(--teal);}
+.tag-water{background:rgba(56,189,248,0.12);color:#38bdf8;}
+.tag-sleep{background:rgba(167,139,250,0.12);color:#a78bfa;}
+.summary-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px;}
+.summary-card{background:var(--bg3);border-radius:var(--radius-sm);padding:14px;border:1px solid var(--border);text-align:center;}
+.summary-num{font-family:'Space Mono',monospace;font-size:22px;font-weight:700;color:var(--purple);}
+.summary-label{font-size:11px;color:var(--text3);margin-top:2px;}
+/* HEATMAP */
+.heatmap-grid{display:grid;grid-template-columns:repeat(24,1fr);gap:3px;margin-top:8px;}
+.heatmap-cell{aspect-ratio:1;border-radius:3px;background:var(--bg4);cursor:pointer;transition:all 0.15s;}
+.heatmap-cell:hover{transform:scale(1.3);}
+.heatmap-cell.h1{background:rgba(155,135,245,0.25);}
+.heatmap-cell.h2{background:rgba(155,135,245,0.45);}
+.heatmap-cell.h3{background:rgba(155,135,245,0.65);}
+.heatmap-cell.h4{background:var(--purple);}
+.heatmap-cell.today{outline:2px solid var(--purple);outline-offset:1px;}
+.heatmap-legend{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text3);margin-top:8px;justify-content:flex-end;}
+.legend-cell{width:12px;height:12px;border-radius:2px;}
+/* CALENDAR */
+.cal-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.cal-nav-btn{background:var(--bg3);border:1px solid var(--border);color:var(--text2);padding:6px 14px;border-radius:var(--radius-sm);cursor:pointer;font-size:13px;transition:all 0.15s;}
+.cal-nav-btn:hover{border-color:var(--border2);color:var(--text);}
+.cal-month-label{font-family:'Space Mono',monospace;font-size:15px;font-weight:700;color:var(--text);}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;}
+.cal-dow{text-align:center;font-size:11px;color:var(--text3);padding:6px 0;font-weight:700;}
+.cal-day{aspect-ratio:1;border-radius:var(--radius-sm);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;border:1px solid transparent;transition:all 0.15s;position:relative;}
+.cal-day:hover{border-color:var(--border2);}
+.cal-day.empty{cursor:default;}
+.cal-day.today-cal{border-color:var(--purple);}
+.cal-day .cal-num{font-size:13px;font-weight:500;color:var(--text2);}
+.cal-day.has-data .cal-num{color:var(--text);}
+.cal-day .cal-dots{display:flex;gap:2px;margin-top:3px;flex-wrap:wrap;justify-content:center;max-width:24px;}
+.cal-dot{width:4px;height:4px;border-radius:50%;}
+.cal-day.full-day{background:var(--purple-dim);}
+/* DAY MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:500;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.2s;}
+.modal-overlay.open{opacity:1;pointer-events:all;}
+.modal{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius);padding:24px;width:360px;max-width:90vw;transform:translateY(8px);transition:transform 0.2s;}
+.modal-overlay.open .modal{transform:translateY(0);}
+.modal-date{font-family:'Space Mono',monospace;font-size:16px;font-weight:700;color:var(--purple);margin-bottom:16px;}
+.modal-item{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);}
+.modal-item:last-child{border-bottom:none;}
+.modal-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.modal-dot.done{background:var(--purple);}
+.modal-dot.undone{background:var(--bg4);border:1px solid var(--text3);}
+.modal-item-label{font-size:13px;color:var(--text2);}
+.modal-item.done-item .modal-item-label{color:var(--text);}
+.modal-close{margin-top:16px;width:100%;padding:10px;background:var(--bg3);border:1px solid var(--border);color:var(--text2);border-radius:var(--radius-sm);cursor:pointer;font-size:13px;transition:all 0.15s;}
+.modal-close:hover{border-color:var(--border2);color:var(--text);}
+/* STATS */
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;}
+.stat-card{background:var(--bg3);border-radius:var(--radius-sm);border:1px solid var(--border);padding:16px;}
+.stat-name{font-size:12px;color:var(--text2);margin-bottom:8px;display:flex;align-items:center;gap:6px;}
+.stat-bar-bg{height:6px;background:var(--bg4);border-radius:3px;overflow:hidden;margin-bottom:6px;}
+.stat-bar-fill{height:100%;border-radius:3px;transition:width 0.5s;}
+.stat-nums{display:flex;justify-content:space-between;font-family:'Space Mono',monospace;font-size:11px;color:var(--text3);}
+.stat-pct{font-family:'Space Mono',monospace;font-size:20px;font-weight:700;color:var(--purple);margin-bottom:4px;}
+/* STREAK */
+.streak-row{display:flex;align-items:center;gap:16px;padding:16px;background:var(--bg3);border-radius:var(--radius-sm);border:1px solid var(--border);margin-bottom:16px;}
+.streak-num{font-family:'Space Mono',monospace;font-size:36px;font-weight:700;color:var(--amber);line-height:1;}
+.streak-label{font-size:12px;color:var(--text3);margin-top:2px;}
+/* LEARN */
+.learn-tabs{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;}
+.learn-tab{padding:7px 16px;border-radius:20px;font-size:13px;cursor:pointer;border:1px solid var(--border);background:var(--bg3);color:var(--text2);transition:all 0.15s;}
+.learn-tab.active{background:var(--purple-dim);color:var(--purple);border-color:rgba(155,135,245,0.3);}
+.learn-content{display:none;}.learn-content.active{display:block;}
+.ai-lesson-box{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:20px;min-height:200px;}
+.ai-lesson-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.ai-lesson-title{font-size:14px;font-weight:700;color:var(--text);}
+.ai-date-badge{font-size:11px;font-family:'Space Mono',monospace;color:var(--text3);background:var(--bg4);padding:3px 8px;border-radius:20px;}
+.ai-loading{display:flex;align-items:center;gap:10px;color:var(--text3);font-size:13px;padding:20px 0;}
+.ai-spinner{width:16px;height:16px;border:2px solid var(--bg4);border-top-color:var(--purple);border-radius:50%;animation:spin 0.8s linear infinite;flex-shrink:0;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.ai-body{font-size:13px;color:var(--text2);line-height:1.85;}
+.ai-body h4{font-size:13px;font-weight:700;color:var(--text);margin:14px 0 6px;}
+.ai-body ul{padding-left:18px;}
+.ai-body li{margin-bottom:5px;}
+.ai-body .hl{display:inline-block;background:var(--purple-dim);color:var(--purple);padding:1px 7px;border-radius:4px;font-family:'Space Mono',monospace;font-size:12px;}
+.ai-body .tip{background:rgba(251,191,36,0.08);border-left:3px solid var(--amber);padding:10px 14px;border-radius:0 6px 6px 0;margin:10px 0;font-size:12px;}
+.ai-refresh{margin-top:14px;padding:8px 16px;background:var(--bg4);border:1px solid var(--border);color:var(--text2);border-radius:var(--radius-sm);cursor:pointer;font-size:12px;transition:all 0.15s;}
+.ai-refresh:hover{border-color:var(--purple);color:var(--purple);}
+.ai-error{color:var(--coral);font-size:13px;padding:12px 0;}
+/* EXERCISE */
+.exercise-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.ex-card{background:var(--bg3);border-radius:var(--radius-sm);border:1px solid var(--border);padding:14px;}
+.ex-name{font-size:13px;font-weight:700;color:var(--text);margin-bottom:6px;}
+.ex-sets{font-family:'Space Mono',monospace;font-size:18px;font-weight:700;color:var(--green);margin-bottom:4px;}
+.ex-detail{font-size:11px;color:var(--text3);line-height:1.5;}
+.ex-muscle{display:inline-block;font-size:10px;padding:2px 7px;border-radius:20px;background:var(--green-dim);color:var(--green);margin-top:6px;font-weight:700;}
+.accordion{margin-bottom:10px;border-radius:var(--radius-sm);overflow:hidden;border:1px solid var(--border);}
+.accordion-header{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:var(--bg3);cursor:pointer;font-size:14px;font-weight:500;color:var(--text);transition:background 0.15s;}
+.accordion-header:hover{background:var(--bg4);}
+.accordion-arrow{color:var(--text3);transition:transform 0.2s;font-size:12px;}
+.accordion.open .accordion-arrow{transform:rotate(180deg);}
+.accordion-body{display:none;padding:16px;background:var(--bg2);border-top:1px solid var(--border);}
+.accordion.open .accordion-body{display:block;}
+.learn-text{font-size:13px;color:var(--text2);line-height:1.8;}
+.learn-text h4{font-size:13px;font-weight:700;color:var(--text);margin:12px 0 6px;}
+.learn-text ul{padding-left:18px;}
+.learn-text li{margin-bottom:5px;}
+.learn-text .highlight{display:inline-block;background:var(--purple-dim);color:var(--purple);padding:1px 7px;border-radius:4px;font-family:'Space Mono',monospace;font-size:12px;}
+.learn-text .tip{background:rgba(251,191,36,0.08);border-left:3px solid var(--amber);padding:10px 14px;border-radius:0 6px 6px 0;margin:10px 0;font-size:12px;color:var(--text2);}
+/* TOAST */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--bg3);border:1px solid var(--purple);color:var(--text);padding:12px 20px;border-radius:var(--radius-sm);font-size:13px;z-index:999;opacity:0;pointer-events:none;transition:all 0.3s;transform:translateY(8px);}
+.toast.show{opacity:1;transform:translateY(0);}
+/* MOBILE */
+.menu-toggle{display:none;position:fixed;top:16px;left:16px;z-index:200;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-sm);width:40px;height:40px;align-items:center;justify-content:center;cursor:pointer;font-size:18px;}
+@media(max-width:700px){
+  .sidebar{transform:translateX(-100%);}
+  .sidebar.open{transform:translateX(0);}
+  .main{margin-left:0;padding:20px 16px;padding-top:64px;}
+  .menu-toggle{display:flex;}
+  .summary-row{grid-template-columns:repeat(2,1fr);}
+  .exercise-grid{grid-template-columns:1fr;}
+  .heatmap-grid{grid-template-columns:repeat(17,1fr);}
+  .stats-grid{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+<div class="menu-toggle" onclick="toggleSidebar()">☰</div>
+<div class="app">
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-title">166天衝刺</div>
+    <div class="logo-sub">BTS演唱會倒數計劃</div>
+  </div>
+  <div class="nav-section">
+    <div class="nav-label">主頁</div>
+    <div class="nav-item active" onclick="showPage('today')"><span class="nav-icon">✦</span> 今日打卡</div>
+    <div class="nav-item" onclick="showPage('review')"><span class="nav-icon">◈</span> 打卡回顧</div>
+  </div>
+  <div class="nav-section">
+    <div class="nav-label">學習</div>
+    <div class="nav-item" onclick="showPage('learn')"><span class="nav-icon">⬡</span> 每日課程</div>
+    <div class="nav-item" onclick="showPage('exercise')"><span class="nav-icon">◎</span> 每日運動</div>
+  </div>
+  <div class="sidebar-bottom">
+    <div class="concert-countdown">
+      <div class="countdown-num" id="countdown-num">—</div>
+      <div class="countdown-label">距離演唱會 11/19</div>
+    </div>
+  </div>
+</nav>
+
+<main class="main">
+
+<!-- TODAY -->
+<div class="page active" id="page-today">
+  <div class="page-header">
+    <div class="today-date" id="today-date">—</div>
+    <div class="today-day" id="today-day">—</div>
+  </div>
+  <div class="summary-row">
+    <div class="summary-card"><div class="summary-num" id="done-count">0</div><div class="summary-label">今日完成</div></div>
+    <div class="summary-card"><div class="summary-num">8</div><div class="summary-label">總項目</div></div>
+    <div class="summary-card"><div class="summary-num" id="streak-count">0</div><div class="summary-label">連續天數</div></div>
+    <div class="summary-card"><div class="summary-num" id="total-days">0</div><div class="summary-label">累計天數</div></div>
+  </div>
+  <div class="card">
+    <div class="card-title">今日任務</div>
+    <div class="checklist" id="checklist">
+      <div class="check-item" onclick="toggle(this)" data-key="korean">
+        <div class="check-box"><span class="check-tick">✓</span></div>
+        <span class="check-label">韓文學習（20–30分鐘）</span>
+        <span class="check-time">13:50</span>
+        <span class="check-tag tag-korean">韓文</span>
+      </div>
+      <div class="check-item" onclick="toggle(this)" data-key="invest">
+        <div class="check-box"><span class="check-tick">✓</span></div>
+        <span class="check-label">投資理財學習（15–20分鐘）</span>
+        <span class="check-time">14:20</span>
+        <span class="check-tag tag-invest">投資</span>
+      </div>
+      <div class="check-item" onclick="toggle(this)" data-key="exercise">
+        <div class="check-box"><span class="check-tick">✓</span></div>
+        <span class="check-label">運動訓練（練3休1）</span>
+        <span class="check-time">15:00</span>
+        <span class="check-tag tag-exercise">運動</span>
+      </div>
+      <div class="check-item" onclick="toggle(this)" data-key="dance">
+        <div class="check-box"><span class="check-tick">✓</span></div>
+        <span class="check-label">舞蹈練習（20分鐘）</span>
+        <span class="check-time">15:50</span>
+        <span class="check-tag tag-dance">舞蹈</span>
+      </div>
+      <div class="check-item" onclick="toggle(this)" data-key="fans">
+        <div class="check-box"><span class="check-tick">✓</span></div>
+        <span class="check-label">應援物製作 / 規劃</span>
+        <span class="check-time">16:20</span>
+        <span class="check-tag tag-fans">應援物</span>
+      </div>
+      <div class="check-item" onclick="toggle(this)" data-key="water">
+        <div class="check-box"><span class="check-tick">✓</span></div>
+        <span class="check-label">喝水達 2000ml</span>
+        <span class="check-time">全天</span>
+        <span class="check-tag tag-water">喝水</span>
+      </div>
+      <div class="check-item" onclick="toggle(this)" data-key="sleep">
+        <div class="check-box"><span class="check-tick">✓</span></div>
+        <span class="check-label">昨晚睡眠達標</span>
+        <span class="check-time">起床後</span>
+        <span class="check-tag tag-sleep">睡眠</span>
+      </div>
+      <div class="check-item" onclick="toggle(this)" data-key="bedtime">
+        <div class="check-box"><span class="check-tick">✓</span></div>
+        <span class="check-label">準時就寢（按當前階段目標）</span>
+        <span class="check-time">02:30</span>
+        <span class="check-tag tag-sleep">作息</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- REVIEW -->
+<div class="page" id="page-review">
+  <div class="page-header">
+    <div class="page-title">打卡回顧</div>
+    <div class="page-sub">月曆視圖 × 習慣統計</div>
+  </div>
+
+  <!-- 連續天數 -->
+  <div class="streak-row">
+    <div style="font-size:28px">🔥</div>
+    <div><div class="streak-num" id="streak-big">0</div><div class="streak-label">天連續打卡</div></div>
+    <div style="margin-left:auto;text-align:right">
+      <div style="font-family:'Space Mono',monospace;font-size:18px;font-weight:700;color:var(--text)" id="total-check-days">0</div>
+      <div class="streak-label">累計打卡天數</div>
+    </div>
+  </div>
+
+  <!-- 熱力圖 -->
+  <div class="card">
+    <div class="card-title">166天熱力圖</div>
+    <div class="heatmap-grid" id="heatmap-grid"></div>
+    <div class="heatmap-legend">
+      <span style="font-size:11px;color:var(--text3)">少</span>
+      <div class="legend-cell" style="background:var(--bg4)"></div>
+      <div class="legend-cell" style="background:rgba(155,135,245,0.25)"></div>
+      <div class="legend-cell" style="background:rgba(155,135,245,0.5)"></div>
+      <div class="legend-cell" style="background:var(--purple)"></div>
+      <span style="font-size:11px;color:var(--text3)">多</span>
+    </div>
+  </div>
+
+  <!-- 月曆 -->
+  <div class="card">
+    <div class="card-title">月曆</div>
+    <div class="cal-nav">
+      <button class="cal-nav-btn" onclick="changeMonth(-1)">‹ 上個月</button>
+      <div class="cal-month-label" id="cal-month-label">—</div>
+      <button class="cal-nav-btn" onclick="changeMonth(1)">下個月 ›</button>
+    </div>
+    <div class="cal-grid" id="cal-grid"></div>
+  </div>
+
+  <!-- 習慣統計 -->
+  <div class="card">
+    <div class="card-title">習慣統計</div>
+    <div class="stats-grid" id="stats-grid"></div>
+  </div>
+</div>
+
+<!-- LEARN -->
+<div class="page" id="page-learn">
+  <div class="page-header">
+    <div class="page-title">每日課程</div>
+    <div class="page-sub">AI每天生成新內容，投資理財 × 基礎韓文</div>
+  </div>
+  <div class="learn-tabs">
+    <div class="learn-tab active" onclick="switchLearn('invest')">💰 投資理財</div>
+    <div class="learn-tab" onclick="switchLearn('korean')">🇰🇷 基礎韓文</div>
+  </div>
+  <div class="learn-content active" id="learn-invest">
+    <div class="ai-lesson-box">
+      <div class="ai-lesson-header">
+        <div class="ai-lesson-title">今日投資課程</div>
+        <div class="ai-date-badge" id="invest-date-badge">—</div>
+      </div>
+      <div id="invest-content"><div class="ai-loading"><div class="ai-spinner"></div>正在生成今日課程…</div></div>
+      <button class="ai-refresh" onclick="loadLesson('invest',true)">↻ 重新生成</button>
+    </div>
+  </div>
+  <div class="learn-content" id="learn-korean">
+    <div class="ai-lesson-box">
+      <div class="ai-lesson-header">
+        <div class="ai-lesson-title">今日韓文課程</div>
+        <div class="ai-date-badge" id="korean-date-badge">—</div>
+      </div>
+      <div id="korean-content"><div class="ai-loading"><div class="ai-spinner"></div>正在生成今日課程…</div></div>
+      <button class="ai-refresh" onclick="loadLesson('korean',true)">↻ 重新生成</button>
+    </div>
+  </div>
+</div>
+
+<!-- EXERCISE -->
+<div class="page" id="page-exercise">
+  <div class="page-header">
+    <div class="page-title">每日運動</div>
+    <div class="page-sub">手臂 + 腹肌，練3天休1天，每次約30分鐘</div>
+  </div>
+  <div class="card" style="background:var(--green-dim);border-color:rgba(74,222,128,0.2)">
+    <div style="font-size:13px;color:var(--green);line-height:1.7">⚡ 原則：每週練3天休1天。訓練前5分鐘暖身，訓練後10分鐘拉伸。第一個月先熟悉動作，第二個月開始加重或加次數。</div>
+  </div>
+  <div class="card">
+    <div class="card-title">💪 手臂訓練</div>
+    <div class="exercise-grid">
+      <div class="ex-card"><div class="ex-name">啞鈴二頭彎舉</div><div class="ex-sets">3 × 12</div><div class="ex-detail">手肘夾緊身體不動，只動前臂。頂端停頓1秒，感受收縮。</div><div class="ex-muscle">二頭肌</div></div>
+      <div class="ex-card"><div class="ex-name">三頭撐體</div><div class="ex-sets">3 × 12</div><div class="ex-detail">椅子或床沿撐體，手肘不要外張，下至90度再推起。</div><div class="ex-muscle">三頭肌</div></div>
+      <div class="ex-card"><div class="ex-name">伏地挺身</div><div class="ex-sets">3 × 10</div><div class="ex-detail">手與肩同寬，身體保持一直線。下去吸氣，推起吐氣。</div><div class="ex-muscle">胸 + 三頭</div></div>
+      <div class="ex-card"><div class="ex-name">啞鈴錘式彎舉</div><div class="ex-sets">3 × 10</div><div class="ex-detail">大拇指朝上，訓練前臂和二頭外側，讓手臂看起來更粗。</div><div class="ex-muscle">二頭 + 前臂</div></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">🔥 腹肌訓練</div>
+    <div class="exercise-grid">
+      <div class="ex-card"><div class="ex-name">捲腹</div><div class="ex-sets">3 × 15</div><div class="ex-detail">屈膝躺下，手輕放耳旁，用腹肌捲起上身約30度。</div><div class="ex-muscle">上腹</div></div>
+      <div class="ex-card"><div class="ex-name">平板支撐</div><div class="ex-sets">3 × 30秒</div><div class="ex-detail">手肘撐地，身體保持一直線，穩定呼吸不要憋氣。</div><div class="ex-muscle">核心全面</div></div>
+      <div class="ex-card"><div class="ex-name">腿部抬升</div><div class="ex-sets">3 × 12</div><div class="ex-detail">躺平雙腿伸直，緩慢抬起至90度再慢慢放下。</div><div class="ex-muscle">下腹</div></div>
+      <div class="ex-card"><div class="ex-name">側捲腹</div><div class="ex-sets">3 × 12（每側）</div><div class="ex-detail">捲腹時身體轉向，右手肘往左膝靠近，再換邊。</div><div class="ex-muscle">腹斜肌</div></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">🧘 拉伸（訓練後必做10分鐘）</div>
+    <div class="learn-text">
+      <ul>
+        <li>手臂拉伸：手臂伸直越過胸前，另一手扣住拉向身體，維持20秒換邊</li>
+        <li>三頭拉伸：手臂舉高彎曲，另一手輕壓手肘，維持20秒換邊</li>
+        <li>貓牛式：四足跪地交替拱背凹背，各10次，放鬆核心</li>
+        <li>嬰兒式：跪趴向前延伸，維持30秒，放鬆整個脊椎</li>
+      </ul>
+      <div class="tip">💡 拉伸不是浪費時間，是讓你隔天不痠痛、繼續練的關鍵</div>
+    </div>
+  </div>
+</div>
+
+</main>
+</div>
+
+<!-- DAY MODAL -->
+<div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
+  <div class="modal">
+    <div class="modal-date" id="modal-date">—</div>
+    <div id="modal-body"></div>
+    <button class="modal-close" onclick="closeModal()">關閉</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const HABITS = ['korean','invest','exercise','dance','fans','water','sleep','bedtime'];
+const HABIT_LABELS = {korean:'韓文學習',invest:'投資理財',exercise:'運動訓練',dance:'舞蹈練習',fans:'應援物',water:'喝水2000ml',sleep:'睡眠達標',bedtime:'準時就寢'};
+const HABIT_COLORS = {korean:'#9b87f5',invest:'#fbbf24',exercise:'#4ade80',dance:'#f87171',fans:'#34d399',water:'#38bdf8',sleep:'#a78bfa',bedtime:'#c084fc'};
+const CONCERT = new Date('2025-11-19');
+const START = new Date('2025-06-06');
+const DAYS = 166;
+
+let calYear = new Date().getFullYear();
+let calMonth = new Date().getMonth();
+
+function todayKey(){
+  const d=new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+function dateKey(d){
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+function getStorage(){ try{return JSON.parse(localStorage.getItem('tracker166')||'{}')}catch(e){return{}} }
+function setStorage(d){ try{localStorage.setItem('tracker166',JSON.stringify(d))}catch(e){} }
+
+function loadToday(){
+  const data=getStorage(), k=todayKey(), today=data[k]||{};
+  document.querySelectorAll('.check-item').forEach(el=>{
+    el.classList.toggle('done', !!today[el.dataset.key]);
+  });
+  updateSummary();
+}
+
+function toggle(el){
+  const key=el.dataset.key, data=getStorage(), k=todayKey();
+  if(!data[k]) data[k]={};
+  const nowDone=!el.classList.contains('done');
+  el.classList.toggle('done', nowDone);
+  data[k][key]=nowDone;
+  setStorage(data);
+  if(nowDone) showToast('✓ 打卡成功！');
+  updateSummary();
+}
+
+function updateSummary(){
+  const data=getStorage(), k=todayKey(), today=data[k]||{};
+  const done=HABITS.filter(h=>today[h]).length;
+  document.getElementById('done-count').textContent=done;
+  const streak=calcStreak(data);
+  document.getElementById('streak-count').textContent=streak;
+  document.getElementById('streak-big').textContent=streak;
+  const totalDays=Object.keys(data).filter(dk=>Object.values(data[dk]).some(v=>v)).length;
+  document.getElementById('total-days').textContent=totalDays;
+  document.getElementById('total-check-days').textContent=totalDays;
+}
+
+function calcStreak(data){
+  let streak=0, d=new Date();
+  for(let i=0;i<200;i++){
+    const k=dateKey(d), day=data[k]||{}, done=HABITS.filter(h=>day[h]).length;
+    if(done>0) streak++;
+    else if(i>0) break;
+    d.setDate(d.getDate()-1);
+  }
+  return streak;
+}
+
+// HEATMAP
+function renderHeatmap(){
+  const data=getStorage(), grid=document.getElementById('heatmap-grid'), todayStr=todayKey();
+  grid.innerHTML='';
+  for(let i=0;i<DAYS;i++){
+    const d=new Date(START); d.setDate(d.getDate()+i);
+    const k=dateKey(d), day=data[k]||{}, done=HABITS.filter(h=>day[h]).length;
+    const ratio=done/HABITS.length;
+    let cls='heatmap-cell';
+    if(ratio>=0.75) cls+=' h4';
+    else if(ratio>=0.5) cls+=' h3';
+    else if(ratio>=0.25) cls+=' h2';
+    else if(ratio>0) cls+=' h1';
+    if(k===todayStr) cls+=' today';
+    const cell=document.createElement('div');
+    cell.className=cls;
+    cell.title=`${d.getMonth()+1}/${d.getDate()} 完成${done}/8`;
+    cell.onclick=()=>openModal(k);
+    grid.appendChild(cell);
+  }
+}
+
+// CALENDAR
+function renderCalendar(){
+  const data=getStorage();
+  const label=['一月','二月','三月','四月','五月','六月','七月','八月','九月','十月','十一月','十二月'];
+  document.getElementById('cal-month-label').textContent=`${calYear}年 ${label[calMonth]}`;
+  const grid=document.getElementById('cal-grid');
+  grid.innerHTML='';
+  ['一','二','三','四','五','六','日'].forEach(d=>{
+    const el=document.createElement('div');
+    el.className='cal-dow'; el.textContent=d; grid.appendChild(el);
+  });
+  const firstDay=new Date(calYear,calMonth,1).getDay();
+  const offset=(firstDay+6)%7;
+  const daysInMonth=new Date(calYear,calMonth+1,0).getDate();
+  const todayStr=todayKey();
+  for(let i=0;i<offset;i++){
+    const el=document.createElement('div'); el.className='cal-day empty'; grid.appendChild(el);
+  }
+  for(let d=1;d<=daysInMonth;d++){
+    const k=`${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const day=data[k]||{}, done=HABITS.filter(h=>day[h]).length;
+    const el=document.createElement('div');
+    el.className='cal-day'+(done>0?' has-data':'')+(done===8?' full-day':'')+(k===todayStr?' today-cal':'');
+    const num=document.createElement('div'); num.className='cal-num'; num.textContent=d;
+    el.appendChild(num);
+    if(done>0){
+      const dots=document.createElement('div'); dots.className='cal-dots';
+      HABITS.filter(h=>day[h]).slice(0,5).forEach(h=>{
+        const dot=document.createElement('div');
+        dot.className='cal-dot'; dot.style.background=HABIT_COLORS[h];
+        dots.appendChild(dot);
+      });
+      el.appendChild(dots);
+      el.onclick=()=>openModal(k);
+    }
+    grid.appendChild(el);
+  }
+}
+
+function changeMonth(dir){
+  calMonth+=dir;
+  if(calMonth>11){calMonth=0;calYear++;}
+  if(calMonth<0){calMonth=11;calYear--;}
+  renderCalendar();
+}
+
+// STATS
+function renderStats(){
+  const data=getStorage();
+  const totalDays=Object.keys(data).filter(k=>Object.values(data[k]).some(v=>v)).length||1;
+  const grid=document.getElementById('stats-grid');
+  grid.innerHTML='';
+  HABITS.forEach(h=>{
+    const count=Object.values(data).filter(d=>d[h]).length;
+    const pct=Math.round(count/Math.max(totalDays,1)*100);
+    const card=document.createElement('div'); card.className='stat-card';
+    card.innerHTML=`<div class="stat-name"><div style="width:8px;height:8px;border-radius:50%;background:${HABIT_COLORS[h]};flex-shrink:0"></div>${HABIT_LABELS[h]}</div>
+    <div class="stat-pct">${pct}%</div>
+    <div class="stat-bar-bg"><div class="stat-bar-fill" style="width:${pct}%;background:${HABIT_COLORS[h]}"></div></div>
+    <div class="stat-nums"><span>${count} 天</span><span>共 ${totalDays} 天</span></div>`;
+    grid.appendChild(card);
+  });
+}
+
+// MODAL
+function openModal(k){
+  const data=getStorage(), day=data[k]||{};
+  const parts=k.split('-');
+  document.getElementById('modal-date').textContent=`${parts[0]}年${parseInt(parts[1])}月${parseInt(parts[2])}日`;
+  const body=document.getElementById('modal-body');
+  body.innerHTML='';
+  HABITS.forEach(h=>{
+    const done=!!day[h];
+    const item=document.createElement('div');
+    item.className='modal-item'+(done?' done-item':'');
+    item.innerHTML=`<div class="modal-dot ${done?'done':'undone'}"></div><div class="modal-item-label">${HABIT_LABELS[h]}</div><div style="margin-left:auto;font-size:12px;color:${done?'var(--purple)':'var(--text3)'}">${done?'✓ 完成':'—'}</div>`;
+    body.appendChild(item);
+  });
+  document.getElementById('modal-overlay').classList.add('open');
+}
+function closeModal(e){
+  if(!e||e.target===document.getElementById('modal-overlay'))
+    document.getElementById('modal-overlay').classList.remove('open');
+}
+
+// AI LESSONS
+const LESSON_CACHE_KEY = 'lesson_cache';
+function getLessonCache(){ try{return JSON.parse(localStorage.getItem(LESSON_CACHE_KEY)||'{}')}catch(e){return{}} }
+function setLessonCache(d){ try{localStorage.setItem(LESSON_CACHE_KEY,JSON.stringify(d))}catch(e){} }
+
+async function loadLesson(type, force=false){
+  const today=todayKey();
+  const cache=getLessonCache();
+  const cacheKey=`${type}_${today}`;
+  const contentEl=document.getElementById(`${type}-content`);
+  const badgeEl=document.getElementById(`${type}-date-badge`);
+  badgeEl.textContent=today;
+  if(!force && cache[cacheKey]){
+    contentEl.innerHTML=cache[cacheKey]; return;
+  }
+  contentEl.innerHTML='<div class="ai-loading"><div class="ai-spinner"></div>正在生成今日課程…</div>';
+  const prompts={
+    invest:`你是一位投資理財教師，專門教台灣零股ETF投資新手。今天是${today}。
+請生成一堂「今日投資課程」，每天主題不同，涵蓋：ETF選股、定期定額、K線基礎、股息再投入、風險控管、心理建設等主題之一。
+格式要求：
+- 用繁體中文
+- 標題用 <h4> 標籤
+- 重點詞用 <span class="hl"> 標籤包起來
+- 提示/小叮嚀用 <div class="tip"> 包起來
+- 條列用 <ul><li> 
+- 整體用 <div class="ai-body"> 包起來
+- 內容扎實，約300字，實用為主
+- 最後加一句「今日行動」告訴讀者今天可以做什麼`,
+    korean:`你是一位韓文老師，專門教從零開始學韓文的台灣學生，目標是能聽懂BTS演唱會上的對話。今天是${today}。
+請生成一堂「今日韓文課程」，每天主題不同，輪流涵蓋：字母/拼音、口語句型、BTS常用語、聽力技巧、數字/時間、日常表達等。
+格式要求：
+- 用繁體中文教學
+- 韓文單字/句子用 <span class="hl"> 標籤包起來
+- 標題用 <h4> 標籤
+- 提示用 <div class="tip"> 包起來
+- 條列用 <ul><li>
+- 整體用 <div class="ai-body"> 包起來
+- 內容約250字，每課至少教5個實用詞或句子
+- 最後加「今日練習」一個簡單的練習題目`
+  };
+  try{
+    const resp=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:1000,
+        messages:[{role:'user',content:prompts[type]}]
+      })
+    });
+    const data=await resp.json();
+    const text=data.content?.map(i=>i.text||'').join('')||'';
+    if(text){
+      contentEl.innerHTML=text;
+      const c=getLessonCache(); c[cacheKey]=text; setLessonCache(c);
+    } else {
+      contentEl.innerHTML='<div class="ai-error">生成失敗，請點下方「重新生成」再試一次。</div>';
+    }
+  }catch(e){
+    contentEl.innerHTML='<div class="ai-error">連線失敗，請確認網路後點「重新生成」。</div>';
+  }
+}
+
+// NAV
+function showPage(name){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n=>{
+    if(n.getAttribute('onclick')?.includes("'"+name+"'")) n.classList.add('active');
+  });
+  if(name==='review'){ renderHeatmap(); renderCalendar(); renderStats(); }
+  if(window.innerWidth<=700) document.getElementById('sidebar').classList.remove('open');
+}
+
+function switchLearn(tab){
+  document.querySelectorAll('.learn-tab').forEach((t,i)=>{
+    t.classList.toggle('active',['invest','korean'][i]===tab);
+  });
+  document.querySelectorAll('.learn-content').forEach(c=>c.classList.remove('active'));
+  document.getElementById('learn-'+tab).classList.add('active');
+  loadLesson(tab);
+}
+
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2000);
+}
+function toggleSidebar(){ document.getElementById('sidebar').classList.toggle('open'); }
+function toggleAcc(h){ h.parentElement.classList.toggle('open'); }
+
+function updateDateDisplay(){
+  const d=new Date(), days=['日','一','二','三','四','五','六'];
+  document.getElementById('today-date').textContent=`${d.getMonth()+1}月${d.getDate()}日`;
+  document.getElementById('today-day').textContent=`星期${days[d.getDay()]}　Day ${Math.floor((d-START)/86400000)+1} / 166`;
+}
+function updateCountdown(){
+  const diff=Math.ceil((CONCERT-new Date())/86400000);
+  document.getElementById('countdown-num').textContent=diff>0?diff+'天':'今天！';
+}
+
+// INIT
+updateDateDisplay();
+updateCountdown();
+loadToday();
+loadLesson('invest');
+setInterval(updateCountdown,60000);
+</script>
+</body>
+</html>
