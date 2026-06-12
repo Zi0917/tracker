@@ -1,0 +1,1658 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>166天衝刺計劃</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#0e0e12;--bg2:#15151c;--bg3:#1c1c26;--bg4:#242430;
+  --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.12);
+  --purple:#9b87f5;--purple2:#7c6de0;--purple-dim:rgba(155,135,245,0.15);
+  --text:#e8e6f0;--text2:#9994b0;--text3:#5a5670;
+  --green:#4ade80;--green-dim:rgba(74,222,128,0.12);
+  --amber:#fbbf24;--amber-dim:rgba(251,191,36,0.12);
+  --coral:#f87171;--teal:#34d399;
+  --radius:12px;--radius-sm:8px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;}
+::-webkit-scrollbar{width:4px;}::-webkit-scrollbar-track{background:var(--bg);}::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:2px;}
+.app{display:flex;min-height:100vh;}
+.sidebar{width:220px;flex-shrink:0;background:var(--bg2);border-right:1px solid var(--border);padding:24px 0;position:fixed;top:0;left:0;height:100vh;overflow-y:auto;z-index:100;transition:transform 0.3s;display:flex;flex-direction:column;}
+.sidebar-logo{padding:0 20px 24px;border-bottom:1px solid var(--border);margin-bottom:16px;}
+.sidebar-logo .logo-title{font-family:'Space Mono',monospace;font-size:13px;font-weight:700;color:var(--purple);letter-spacing:0.05em;}
+.sidebar-logo .logo-sub{font-size:11px;color:var(--text3);margin-top:3px;}
+.nav-section{padding:0 12px;margin-bottom:8px;}
+.nav-label{font-size:10px;font-weight:700;letter-spacing:0.1em;color:var(--text3);padding:0 8px;margin-bottom:4px;text-transform:uppercase;}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:var(--radius-sm);font-size:13px;color:var(--text2);cursor:pointer;transition:all 0.15s;border:1px solid transparent;}
+.nav-item:hover{background:var(--bg3);color:var(--text);}
+.nav-item.active{background:var(--purple-dim);color:var(--purple);border-color:rgba(155,135,245,0.2);}
+.nav-icon{font-size:16px;width:20px;text-align:center;}
+.sidebar-bottom{margin-top:auto;padding:16px 20px;border-top:1px solid var(--border);}
+.concert-countdown{text-align:center;}
+.countdown-num{font-family:'Space Mono',monospace;font-size:26px;font-weight:700;color:var(--purple);}
+.countdown-label{font-size:10px;color:var(--text3);margin-top:2px;}
+.main{margin-left:220px;flex:1;padding:32px;max-width:960px;}
+.page{display:none;}.page.active{display:block;}
+.page-header{margin-bottom:28px;}
+.page-title{font-size:22px;font-weight:700;color:var(--text);}
+.page-sub{font-size:13px;color:var(--text2);margin-top:4px;}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:16px;}
+.card-title{font-size:13px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:16px;}
+.today-date{font-family:'Space Mono',monospace;font-size:28px;font-weight:700;color:var(--purple);margin-bottom:4px;}
+.today-day{font-size:13px;color:var(--text3);margin-bottom:24px;}
+.checklist{display:flex;flex-direction:column;gap:8px;}
+.check-item{display:flex;align-items:center;gap:14px;padding:14px 16px;background:var(--bg3);border-radius:var(--radius-sm);border:1px solid var(--border);cursor:pointer;transition:all 0.2s;user-select:none;}
+.check-item:hover{border-color:var(--border2);}
+.drag-handle{color:var(--text3);font-size:16px;cursor:grab;padding:0 4px 0 0;flex-shrink:0;touch-action:none;}
+.drag-handle:active{cursor:grabbing;}
+.check-item.drag-over{border-color:var(--purple);background:var(--purple-dim);}
+.check-item.dragging{opacity:0.4;}
+.check-item.done{border-color:rgba(155,135,245,0.25);}
+.check-item.done .check-label{color:var(--text3);text-decoration:line-through;}
+.check-box{width:22px;height:22px;border-radius:6px;border:2px solid var(--text3);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all 0.2s;}
+.check-item.done .check-box{background:var(--purple);border-color:var(--purple);}
+.check-tick{color:#fff;font-size:13px;display:none;}
+.check-item.done .check-tick{display:block;}
+.check-label{font-size:14px;color:var(--text);flex:1;}
+.check-time{font-size:11px;color:var(--text3);white-space:nowrap;font-family:'Space Mono',monospace;}
+.check-tag{font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px;letter-spacing:0.05em;}
+.tag-korean{background:var(--purple-dim);color:var(--purple);}
+.tag-invest{background:var(--amber-dim);color:var(--amber);}
+.tag-exercise{background:var(--green-dim);color:var(--green);}
+.tag-dance{background:rgba(248,113,113,0.12);color:var(--coral);}
+.tag-fans{background:rgba(52,211,153,0.12);color:var(--teal);}
+.tag-water{background:rgba(56,189,248,0.12);color:#38bdf8;}
+.tag-sleep{background:rgba(167,139,250,0.12);color:#a78bfa;}
+.summary-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px;}
+.summary-card{background:var(--bg3);border-radius:var(--radius-sm);padding:14px;border:1px solid var(--border);text-align:center;}
+.summary-num{font-family:'Space Mono',monospace;font-size:22px;font-weight:700;color:var(--purple);}
+.summary-label{font-size:11px;color:var(--text3);margin-top:2px;}
+/* HEATMAP */
+.heatmap-grid{display:grid;grid-template-columns:repeat(24,1fr);gap:3px;margin-top:8px;}
+.heatmap-cell{aspect-ratio:1;border-radius:3px;background:var(--bg4);cursor:pointer;transition:all 0.15s;}
+.heatmap-cell:hover{transform:scale(1.3);}
+.heatmap-cell.h1{background:rgba(155,135,245,0.25);}
+.heatmap-cell.h2{background:rgba(155,135,245,0.45);}
+.heatmap-cell.h3{background:rgba(155,135,245,0.65);}
+.heatmap-cell.h4{background:var(--purple);}
+.heatmap-cell.today{outline:2px solid var(--purple);outline-offset:1px;}
+.heatmap-legend{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text3);margin-top:8px;justify-content:flex-end;}
+.legend-cell{width:12px;height:12px;border-radius:2px;}
+/* CALENDAR */
+.cal-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.cal-nav-btn{background:var(--bg3);border:1px solid var(--border);color:var(--text2);padding:6px 14px;border-radius:var(--radius-sm);cursor:pointer;font-size:13px;transition:all 0.15s;}
+.cal-nav-btn:hover{border-color:var(--border2);color:var(--text);}
+.cal-month-label{font-family:'Space Mono',monospace;font-size:15px;font-weight:700;color:var(--text);}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;}
+.cal-dow{text-align:center;font-size:11px;color:var(--text3);padding:6px 0;font-weight:700;}
+.cal-day{aspect-ratio:1;border-radius:var(--radius-sm);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;border:1px solid transparent;transition:all 0.15s;position:relative;}
+.cal-day:hover{border-color:var(--border2);}
+.cal-day.empty{cursor:default;}
+.cal-day.today-cal{border-color:var(--purple);}
+.cal-day .cal-num{font-size:13px;font-weight:500;color:var(--text2);}
+.cal-day.has-data .cal-num{color:var(--text);}
+.cal-day .cal-dots{display:flex;gap:2px;margin-top:3px;flex-wrap:wrap;justify-content:center;max-width:24px;}
+.cal-dot{width:4px;height:4px;border-radius:50%;}
+.cal-day.full-day{background:var(--purple-dim);}
+/* DAY MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:500;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.2s;}
+.modal-overlay.open{opacity:1;pointer-events:all;}
+.modal{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius);padding:24px;width:360px;max-width:90vw;transform:translateY(8px);transition:transform 0.2s;}
+.modal-overlay.open .modal{transform:translateY(0);}
+.modal-date{font-family:'Space Mono',monospace;font-size:16px;font-weight:700;color:var(--purple);margin-bottom:16px;}
+.modal-item{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);}
+.modal-item:last-child{border-bottom:none;}
+.modal-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.modal-dot.done{background:var(--purple);}
+.modal-dot.undone{background:var(--bg4);border:1px solid var(--text3);}
+.modal-item-label{font-size:13px;color:var(--text2);}
+.modal-item.done-item .modal-item-label{color:var(--text);}
+.modal-close{margin-top:16px;width:100%;padding:10px;background:var(--bg3);border:1px solid var(--border);color:var(--text2);border-radius:var(--radius-sm);cursor:pointer;font-size:13px;transition:all 0.15s;}
+.modal-close:hover{border-color:var(--border2);color:var(--text);}
+/* STATS */
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;}
+.stat-card{background:var(--bg3);border-radius:var(--radius-sm);border:1px solid var(--border);padding:16px;}
+.stat-name{font-size:12px;color:var(--text2);margin-bottom:8px;display:flex;align-items:center;gap:6px;}
+.stat-bar-bg{height:6px;background:var(--bg4);border-radius:3px;overflow:hidden;margin-bottom:6px;}
+.stat-bar-fill{height:100%;border-radius:3px;transition:width 0.5s;}
+.stat-nums{display:flex;justify-content:space-between;font-family:'Space Mono',monospace;font-size:11px;color:var(--text3);}
+.stat-pct{font-family:'Space Mono',monospace;font-size:20px;font-weight:700;color:var(--purple);margin-bottom:4px;}
+/* STREAK */
+.streak-row{display:flex;align-items:center;gap:16px;padding:16px;background:var(--bg3);border-radius:var(--radius-sm);border:1px solid var(--border);margin-bottom:16px;}
+.streak-num{font-family:'Space Mono',monospace;font-size:36px;font-weight:700;color:var(--amber);line-height:1;}
+.streak-label{font-size:12px;color:var(--text3);margin-top:2px;}
+/* LEARN */
+.learn-tabs{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;}
+.learn-tab{padding:7px 16px;border-radius:20px;font-size:13px;cursor:pointer;border:1px solid var(--border);background:var(--bg3);color:var(--text2);transition:all 0.15s;}
+.learn-tab.active{background:var(--purple-dim);color:var(--purple);border-color:rgba(155,135,245,0.3);}
+.learn-content{display:none;}.learn-content.active{display:block;}
+.ai-lesson-box{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:20px;min-height:200px;}
+.ai-lesson-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.ai-lesson-title{font-size:14px;font-weight:700;color:var(--text);}
+.ai-date-badge{font-size:11px;font-family:'Space Mono',monospace;color:var(--text3);background:var(--bg4);padding:3px 8px;border-radius:20px;}
+.ai-loading{display:flex;align-items:center;gap:10px;color:var(--text3);font-size:13px;padding:20px 0;}
+.ai-spinner{width:16px;height:16px;border:2px solid var(--bg4);border-top-color:var(--purple);border-radius:50%;animation:spin 0.8s linear infinite;flex-shrink:0;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.ai-body{font-size:13px;color:var(--text2);line-height:1.85;}
+.ai-body h4{font-size:13px;font-weight:700;color:var(--text);margin:14px 0 6px;}
+.ai-body ul{padding-left:18px;}
+.ai-body li{margin-bottom:5px;}
+.ai-body .hl{display:inline-block;background:var(--purple-dim);color:var(--purple);padding:1px 7px;border-radius:4px;font-family:'Space Mono',monospace;font-size:12px;}
+.ai-body .tip{background:rgba(251,191,36,0.08);border-left:3px solid var(--amber);padding:10px 14px;border-radius:0 6px 6px 0;margin:10px 0;font-size:12px;}
+.ai-refresh{margin-top:14px;padding:8px 16px;background:var(--bg4);border:1px solid var(--border);color:var(--text2);border-radius:var(--radius-sm);cursor:pointer;font-size:12px;transition:all 0.15s;}
+.ai-refresh:hover{border-color:var(--purple);color:var(--purple);}
+.ai-error{color:var(--coral);font-size:13px;padding:12px 0;}
+/* EXERCISE */
+.exercise-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.ex-card{background:var(--bg3);border-radius:var(--radius-sm);border:1px solid var(--border);padding:14px;}
+.ex-name{font-size:13px;font-weight:700;color:var(--text);margin-bottom:6px;}
+.ex-sets{font-family:'Space Mono',monospace;font-size:18px;font-weight:700;color:var(--green);margin-bottom:4px;}
+.ex-detail{font-size:11px;color:var(--text3);line-height:1.5;}
+.ex-muscle{display:inline-block;font-size:10px;padding:2px 7px;border-radius:20px;background:var(--green-dim);color:var(--green);margin-top:6px;font-weight:700;}
+.accordion{margin-bottom:10px;border-radius:var(--radius-sm);overflow:hidden;border:1px solid var(--border);}
+.accordion-header{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:var(--bg3);cursor:pointer;font-size:14px;font-weight:500;color:var(--text);transition:background 0.15s;}
+.accordion-header:hover{background:var(--bg4);}
+.accordion-arrow{color:var(--text3);transition:transform 0.2s;font-size:12px;}
+.accordion.open .accordion-arrow{transform:rotate(180deg);}
+.accordion-body{display:none;padding:16px;background:var(--bg2);border-top:1px solid var(--border);}
+.accordion.open .accordion-body{display:block;}
+.learn-text{font-size:13px;color:var(--text2);line-height:1.8;}
+.learn-text h4{font-size:13px;font-weight:700;color:var(--text);margin:12px 0 6px;}
+.learn-text ul{padding-left:18px;}
+.learn-text li{margin-bottom:5px;}
+.learn-text .highlight{display:inline-block;background:var(--purple-dim);color:var(--purple);padding:1px 7px;border-radius:4px;font-family:'Space Mono',monospace;font-size:12px;}
+.learn-text .tip{background:rgba(251,191,36,0.08);border-left:3px solid var(--amber);padding:10px 14px;border-radius:0 6px 6px 0;margin:10px 0;font-size:12px;color:var(--text2);}
+/* TOAST */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--bg3);border:1px solid var(--purple);color:var(--text);padding:12px 20px;border-radius:var(--radius-sm);font-size:13px;z-index:999;opacity:0;pointer-events:none;transition:all 0.3s;transform:translateY(8px);}
+.toast.show{opacity:1;transform:translateY(0);}
+/* MOBILE */
+.menu-toggle{display:none;position:fixed;top:16px;left:16px;z-index:200;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-sm);width:40px;height:40px;align-items:center;justify-content:center;cursor:pointer;font-size:18px;}
+@media(max-width:700px){
+  .sidebar{transform:translateX(-100%);}
+  .sidebar.open{transform:translateX(0);}
+  .main{margin-left:0;padding:20px 16px;padding-top:64px;}
+  .menu-toggle{display:flex;}
+  .summary-row{grid-template-columns:repeat(2,1fr);}
+  .exercise-grid{grid-template-columns:1fr;}
+  .heatmap-grid{grid-template-columns:repeat(17,1fr);}
+  .stats-grid{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+<div class="menu-toggle" onclick="toggleSidebar()">☰</div>
+<div class="app">
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-title">166天衝刺</div>
+    <div class="logo-sub">BTS演唱會倒數計劃</div>
+  </div>
+  <div class="nav-section">
+    <div class="nav-label">主頁</div>
+    <div class="nav-item active" onclick="showPage('today')"><span class="nav-icon">✦</span> 今日打卡</div>
+    <div class="nav-item" onclick="showPage('review')"><span class="nav-icon">◈</span> 打卡回顧</div>
+  </div>
+  <div class="nav-section">
+    <div class="nav-label">學習</div>
+    <div class="nav-item" onclick="showPage('learn')"><span class="nav-icon">⬡</span> 每日課程</div>
+    <div class="nav-item" onclick="showPage('exercise')"><span class="nav-icon">◎</span> 每日運動</div>
+  </div>
+  <div class="nav-section">
+    <div class="nav-label">筆記</div>
+    <div class="nav-item" onclick="showPage('todo')"><span class="nav-icon">✦</span> 當日待辦</div>
+    <div class="nav-item" onclick="showPage('inspire')"><span class="nav-icon">✦</span> 靈感收集箱</div>
+  </div>
+  <div class="sidebar-bottom">
+    <div class="concert-countdown">
+      <div style="background:var(--bg4);border:1px solid var(--border2);border-radius:10px;padding:14px 12px;text-align:center;">
+        <div style="font-size:10px;font-weight:700;letter-spacing:0.12em;color:var(--text3);text-transform:uppercase;margin-bottom:8px;">距離演唱會 11/19</div>
+        <div style="display:flex;align-items:flex-end;justify-content:center;gap:4px;margin-bottom:6px;">
+          <div id="countdown-num" style="font-family:'Space Mono',monospace;font-size:42px;font-weight:700;color:var(--purple);line-height:1;">—</div>
+          <div style="font-size:14px;color:var(--text2);padding-bottom:6px;font-weight:500;">天</div>
+        </div>
+        <div style="height:3px;background:var(--bg3);border-radius:2px;overflow:hidden;">
+          <div id="countdown-bar" style="height:100%;background:var(--purple);border-radius:2px;transition:width 0.5s;width:0%"></div>
+        </div>
+        <div id="countdown-date" style="font-size:10px;color:var(--text3);margin-top:6px;">—</div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<main class="main">
+
+<!-- TODAY -->
+<div class="page active" id="page-today">
+  <div class="page-header">
+    <div class="today-date" id="today-date">—</div>
+    <div class="today-day" id="today-day">—</div>
+    <div id="motto-today" onclick="startEdit('motto-today','motto_today')" title="點擊編輯" style="font-size:13px;color:var(--text2);line-height:1.8;margin-bottom:20px;padding:14px 16px;background:var(--bg3);border-radius:var(--radius-sm);border-left:3px solid var(--purple);cursor:pointer;transition:border-color 0.2s;white-space:pre-wrap;">別故步自封，人生容錯那麼多，本該有無限可能性 🐳𓂃 .｡
+焦慮源自於沒有作為，只需3秒，行動起來，好運到來.ᐟ.ᐟ.☘︎ ݁˖˚</div>
+  </div>
+  <div class="summary-row">
+    <div class="summary-card"><div class="summary-num" id="done-count">0</div><div class="summary-label">今日完成</div></div>
+    <div class="summary-card"><div class="summary-num">8</div><div class="summary-label">總項目</div></div>
+    <div class="summary-card"><div class="summary-num" id="streak-count">0</div><div class="summary-label">連續天數</div></div>
+    <div class="summary-card"><div class="summary-num" id="total-days">0</div><div class="summary-label">累計天數</div></div>
+  </div>
+  <div class="card">
+    <div class="card-title">今日任務</div>
+    <div class="checklist" id="checklist">
+      <div class="check-item" draggable="true" ondragstart="dragStart(event)" ondragover="dragOver(event)" ondrop="dropItem(event)" ondragend="dragEnd(event)" onclick="toggle(this)" data-key="korean"><span class="drag-handle" onclick="event.stopPropagation()">⠿</span>
+        <div class="check-box"><span class="check-tick">✓</span></div>
+        <span class="check-label">韓文學習（20–30分鐘）</span>
+        <span class="check-tag tag-korean">韓文</span>
+      </div>
+      <div class="check-item" draggable="true" ondragstart="dragStart(event)" ondragover="dragOver(event)" ondrop="dropItem(event)" ondragend="dragEnd(event)" onclick="toggle(this)" data-key="invest"><span class="drag-handle" onclick="event.stopPropagation()">⠿</span>
+        <div class="check-box"><span class="check-tick">✓</span></div>
+        <span class="check-label">投資理財學習（15–20分鐘）</span>
+        <span class="check-tag tag-invest">投資</span>
+      </div>
+      <div class="check-item" draggable="true" ondragstart="dragStart(event)" ondragover="dragOver(event)" ondrop="dropItem(event)" ondragend="dragEnd(event)" onclick="toggle(this)" data-key="exercise"><span class="drag-handle" onclick="event.stopPropagation()">⠿</span>
+        <div class="check-box"><span class="check-tick">✓</span></div>
+        <span class="check-label">運動訓練（練3休1）</span>
+        <span class="check-tag tag-exercise">運動</span>
+      </div>
+      <div class="check-item" draggable="true" ondragstart="dragStart(event)" ondragover="dragOver(event)" ondrop="dropItem(event)" ondragend="dragEnd(event)" onclick="toggle(this)" data-key="dance"><span class="drag-handle" onclick="event.stopPropagation()">⠿</span>
+        <div class="check-box"><span class="check-tick">✓</span></div>
+        <span class="check-label">舞蹈練習（20分鐘）</span>
+        <span class="check-tag tag-dance">舞蹈</span>
+      </div>
+      <div class="check-item" draggable="true" ondragstart="dragStart(event)" ondragover="dragOver(event)" ondrop="dropItem(event)" ondragend="dragEnd(event)" onclick="toggle(this)" data-key="fans"><span class="drag-handle" onclick="event.stopPropagation()">⠿</span>
+        <div class="check-box"><span class="check-tick">✓</span></div>
+        <span class="check-label">應援物製作 / 規劃</span>
+        <span class="check-tag tag-fans">應援物</span>
+      </div>
+      <div class="check-item" draggable="true" ondragstart="dragStart(event)" ondragover="dragOver(event)" ondrop="dropItem(event)" ondragend="dragEnd(event)" onclick="toggle(this)" data-key="water"><span class="drag-handle" onclick="event.stopPropagation()">⠿</span>
+        <div class="check-box"><span class="check-tick">✓</span></div>
+        <span class="check-label">喝水達 2000ml</span>
+        <span class="check-tag tag-water">喝水</span>
+      </div>
+      <div class="check-item" draggable="true" ondragstart="dragStart(event)" ondragover="dragOver(event)" ondrop="dropItem(event)" ondragend="dragEnd(event)" onclick="toggle(this)" data-key="sleep"><span class="drag-handle" onclick="event.stopPropagation()">⠿</span>
+        <div class="check-box"><span class="check-tick">✓</span></div>
+        <span class="check-label">昨晚睡眠達標</span>
+        <span class="check-tag tag-sleep">睡眠</span>
+      </div>
+      <div class="check-item" draggable="true" ondragstart="dragStart(event)" ondragover="dragOver(event)" ondrop="dropItem(event)" ondragend="dragEnd(event)" onclick="toggle(this)" data-key="bedtime"><span class="drag-handle" onclick="event.stopPropagation()">⠿</span>
+        <div class="check-box"><span class="check-tick">✓</span></div>
+        <span class="check-label">準時就寢（按當前階段目標）</span>
+        <span class="check-tag tag-sleep">作息</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- REVIEW -->
+<div class="page" id="page-review">
+  <div class="page-header">
+    <div class="page-title">打卡回顧</div>
+    <div class="page-sub">月曆視圖 × 習慣統計</div>
+  </div>
+
+  <!-- 連續天數 -->
+  <div class="streak-row">
+    <div style="font-size:28px">🔥</div>
+    <div><div class="streak-num" id="streak-big">0</div><div class="streak-label">天連續打卡</div></div>
+    <div style="margin-left:auto;text-align:right">
+      <div style="font-family:'Space Mono',monospace;font-size:18px;font-weight:700;color:var(--text)" id="total-check-days">0</div>
+      <div class="streak-label">累計打卡天數</div>
+    </div>
+  </div>
+
+  <!-- 熱力圖 -->
+  <div class="card">
+    <div class="card-title">打卡完成率</div>
+    <div class="heatmap-grid" id="heatmap-grid"></div>
+    <div class="heatmap-legend">
+      <span style="font-size:11px;color:var(--text3)">少</span>
+      <div class="legend-cell" style="background:var(--bg4)"></div>
+      <div class="legend-cell" style="background:rgba(155,135,245,0.25)"></div>
+      <div class="legend-cell" style="background:rgba(155,135,245,0.5)"></div>
+      <div class="legend-cell" style="background:var(--purple)"></div>
+      <span style="font-size:11px;color:var(--text3)">多</span>
+    </div>
+  </div>
+
+  <!-- 月曆 -->
+  <div class="card">
+    <div class="card-title">月曆</div>
+    <div class="cal-nav">
+      <button class="cal-nav-btn" onclick="changeMonth(-1)">‹ 上個月</button>
+      <div class="cal-month-label" id="cal-month-label">—</div>
+      <button class="cal-nav-btn" onclick="changeMonth(1)">下個月 ›</button>
+    </div>
+    <div class="cal-grid" id="cal-grid"></div>
+  </div>
+
+  <!-- 習慣統計 -->
+  <div class="card">
+    <div class="card-title">習慣統計</div>
+    <div class="stats-grid" id="stats-grid"></div>
+  </div>
+</div>
+
+<!-- LEARN -->
+<div class="page" id="page-learn">
+  <div class="page-header">
+    <div class="page-title">每週課程</div>
+    <div class="page-sub">24週學習大綱，投資理財 × 基礎韓文</div>
+  </div>
+  <div class="learn-tabs">
+    <div class="learn-tab active" onclick="switchLearn('invest')">💰 投資理財</div>
+    <div class="learn-tab" onclick="switchLearn('korean')">🇰🇷 基礎韓文</div>
+  </div>
+  <div class="learn-content active" id="learn-invest">
+    <div class="card" style="background:var(--amber-dim);border-color:rgba(251,191,36,0.2);margin-bottom:16px">
+      <div id="motto-invest" onclick="startEdit('motto-invest','motto_invest')" title="點擊編輯" style="font-size:13px;color:var(--amber);line-height:1.7;cursor:pointer;white-space:pre-wrap;">今天是人生最年輕的一天，如果你不喜歡此刻，就該主動去對環境做出抵抗✎📖</div>
+    </div>
+    <div id="invest-weeks"></div>
+  </div>
+  <div class="learn-content" id="learn-korean">
+    <div class="card" style="background:var(--purple-dim);border-color:rgba(155,135,245,0.2);margin-bottom:16px">
+      <div id="motto-korean" onclick="startEdit('motto-korean','motto_korean')" title="點擊編輯" style="font-size:13px;color:var(--purple);line-height:1.7;cursor:pointer;white-space:pre-wrap;">滴水穿石，每天一點點學習，聽懂他們說話的瞬間，一切都會值得︎︎⋆͛📢⋆</div>
+    </div>
+    <div id="korean-weeks"></div>
+  </div>
+</div>
+
+<!-- EXERCISE -->
+<div class="page" id="page-exercise">
+  <div class="page-header">
+    <div class="page-title">每日運動</div>
+    <div class="page-sub">手臂 + 腹肌，練3天休1天，每次約30分鐘</div>
+  </div>
+  <div class="card" style="background:var(--green-dim);border-color:rgba(74,222,128,0.2)">
+    <div style="font-size:13px;color:var(--green);line-height:1.7">⚡ 原則：每週練3天休1天。訓練前5分鐘暖身，訓練後10分鐘拉伸。第一個月先熟悉動作，第二個月開始加重或加次數。</div>
+  </div>
+  <div class="card">
+    <div class="card-title">💪 手臂訓練</div>
+    <div class="exercise-grid">
+      <div class="ex-card"><div class="ex-name">啞鈴二頭彎舉</div><div class="ex-sets">3 × 12</div><div class="ex-detail">手肘夾緊身體不動，只動前臂。頂端停頓1秒，感受收縮。</div><div class="ex-muscle">二頭肌</div></div>
+      <div class="ex-card"><div class="ex-name">三頭撐體</div><div class="ex-sets">3 × 12</div><div class="ex-detail">椅子或床沿撐體，手肘不要外張，下至90度再推起。</div><div class="ex-muscle">三頭肌</div></div>
+      <div class="ex-card"><div class="ex-name">伏地挺身</div><div class="ex-sets">3 × 10</div><div class="ex-detail">手與肩同寬，身體保持一直線。下去吸氣，推起吐氣。</div><div class="ex-muscle">胸 + 三頭</div></div>
+      <div class="ex-card"><div class="ex-name">啞鈴錘式彎舉</div><div class="ex-sets">3 × 10</div><div class="ex-detail">大拇指朝上，訓練前臂和二頭外側，讓手臂看起來更粗。</div><div class="ex-muscle">二頭 + 前臂</div></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">🔥 腹肌訓練</div>
+    <div class="exercise-grid">
+      <div class="ex-card"><div class="ex-name">捲腹</div><div class="ex-sets">3 × 15</div><div class="ex-detail">屈膝躺下，手輕放耳旁，用腹肌捲起上身約30度。</div><div class="ex-muscle">上腹</div></div>
+      <div class="ex-card"><div class="ex-name">平板支撐</div><div class="ex-sets">3 × 30秒</div><div class="ex-detail">手肘撐地，身體保持一直線，穩定呼吸不要憋氣。</div><div class="ex-muscle">核心全面</div></div>
+      <div class="ex-card"><div class="ex-name">腿部抬升</div><div class="ex-sets">3 × 12</div><div class="ex-detail">躺平雙腿伸直，緩慢抬起至90度再慢慢放下。</div><div class="ex-muscle">下腹</div></div>
+      <div class="ex-card"><div class="ex-name">側捲腹</div><div class="ex-sets">3 × 12（每側）</div><div class="ex-detail">捲腹時身體轉向，右手肘往左膝靠近，再換邊。</div><div class="ex-muscle">腹斜肌</div></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">🧘 拉伸（訓練後必做10分鐘）</div>
+    <div class="learn-text">
+      <ul>
+        <li>手臂拉伸：手臂伸直越過胸前，另一手扣住拉向身體，維持20秒換邊</li>
+        <li>三頭拉伸：手臂舉高彎曲，另一手輕壓手肘，維持20秒換邊</li>
+        <li>貓牛式：四足跪地交替拱背凹背，各10次，放鬆核心</li>
+        <li>嬰兒式：跪趴向前延伸，維持30秒，放鬆整個脊椎</li>
+      </ul>
+      <div class="tip">💡 拉伸不是浪費時間，是讓你隔天不痠痛、繼續練的關鍵</div>
+    </div>
+  </div>
+</div>
+
+<!-- TODO PAGE -->
+<div class="page" id="page-todo">
+  <div class="page-header">
+    <div class="page-title">當日待辦</div>
+    <div class="page-sub">今天要做的事，完成就勾掉</div>
+  </div>
+  <div class="card">
+    <div style="display:flex;gap:8px;margin-bottom:16px;">
+      <input id="todo-input" type="text" placeholder="新增待辦事項…" style="flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 14px;font-size:13px;color:var(--text);outline:none;font-family:inherit;" onkeydown="if(event.key==='Enter')addTodo()">
+      <button onclick="addTodo()" style="background:var(--purple-dim);border:1px solid rgba(155,135,245,0.3);color:var(--purple);border-radius:var(--radius-sm);padding:10px 16px;font-size:13px;cursor:pointer;white-space:nowrap;">+ 新增</button>
+    </div>
+    <div id="todo-list" style="display:flex;flex-direction:column;gap:6px;"></div>
+  </div>
+  <div class="card" id="todo-done-section" style="display:none;">
+    <div style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;" onclick="toggleDoneList()">
+      <div class="card-title" style="margin-bottom:0;">已完成 <span id="todo-done-count" style="color:var(--text3);font-size:11px;"></span></div>
+      <span id="done-arrow" style="font-size:11px;color:var(--text3);transition:transform 0.2s;">▼</span>
+    </div>
+    <div id="todo-done-list" style="display:none;margin-top:12px;display:flex;flex-direction:column;gap:6px;"></div>
+  </div>
+</div>
+
+<!-- INSPIRE PAGE -->
+<div class="page" id="page-inspire">
+  <div class="page-header">
+    <div class="page-title">靈感收集箱</div>
+    <div class="page-sub">長期目標、想法、靈感，隨時記下來</div>
+  </div>
+  <div class="card">
+    <div style="display:flex;gap:8px;margin-bottom:16px;">
+      <input id="inspire-input" type="text" placeholder="記下一個想法或長期目標…" style="flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 14px;font-size:13px;color:var(--text);outline:none;font-family:inherit;" onkeydown="if(event.key==='Enter')addInspire()">
+      <button onclick="addInspire()" style="background:var(--purple-dim);border:1px solid rgba(155,135,245,0.3);color:var(--purple);border-radius:var(--radius-sm);padding:10px 16px;font-size:13px;cursor:pointer;white-space:nowrap;">+ 新增</button>
+    </div>
+    <div id="inspire-list" style="display:flex;flex-direction:column;gap:6px;"></div>
+  </div>
+  <div class="card" id="inspire-done-section" style="display:none;">
+    <div style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;" onclick="toggleInspireDone()">
+      <div class="card-title" style="margin-bottom:0;">已完成目標 <span id="inspire-done-count" style="color:var(--text3);font-size:11px;"></span></div>
+      <span id="inspire-done-arrow" style="font-size:11px;color:var(--text3);transition:transform 0.2s;">▼</span>
+    </div>
+    <div id="inspire-done-list" style="display:none;margin-top:12px;display:flex;flex-direction:column;gap:6px;"></div>
+  </div>
+</div>
+
+</main>
+</div>
+
+<!-- DAY MODAL -->
+<div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
+  <div class="modal">
+    <div class="modal-date" id="modal-date">—</div>
+    <div id="modal-body"></div>
+    <button class="modal-close" onclick="closeModal()">關閉</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const HABITS = ['korean','invest','exercise','dance','fans','water','sleep','bedtime'];
+const HABIT_LABELS = {korean:'韓文學習',invest:'投資理財',exercise:'運動訓練',dance:'舞蹈練習',fans:'應援物',water:'喝水2000ml',sleep:'睡眠達標',bedtime:'準時就寢'};
+const HABIT_COLORS = {korean:'#9b87f5',invest:'#fbbf24',exercise:'#4ade80',dance:'#f87171',fans:'#34d399',water:'#38bdf8',sleep:'#a78bfa',bedtime:'#c084fc'};
+// CONCERT defined above
+// START_DATE used instead
+// DAYS computed dynamically
+
+let calYear = new Date().getFullYear();
+let calMonth = new Date().getMonth();
+
+function todayKey(){
+  const d=new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+function dateKey(d){
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+function getStorage(){ try{return JSON.parse(localStorage.getItem('tracker166')||'{}')}catch(e){return{}} }
+function setStorage(d){ try{localStorage.setItem('tracker166',JSON.stringify(d))}catch(e){} }
+
+function loadToday(){
+  const data=getStorage(), k=todayKey(), today=data[k]||{};
+  document.querySelectorAll('.check-item').forEach(el=>{
+    el.classList.toggle('done', !!today[el.dataset.key]);
+  });
+  updateSummary();
+}
+
+function toggle(el){
+  const key=el.dataset.key, data=getStorage(), k=todayKey();
+  if(!data[k]) data[k]={};
+  const nowDone=!el.classList.contains('done');
+  el.classList.toggle('done', nowDone);
+  data[k][key]=nowDone;
+  setStorage(data);
+  if(nowDone) showToast('✓ 打卡成功！');
+  updateSummary();
+}
+
+function updateSummary(){
+  const data=getStorage(), k=todayKey(), today=data[k]||{};
+  const done=HABITS.filter(h=>today[h]).length;
+  document.getElementById('done-count').textContent=done;
+  const streak=calcStreak(data);
+  document.getElementById('streak-count').textContent=streak;
+  document.getElementById('streak-big').textContent=streak;
+  const totalDays=Object.keys(data).filter(dk=>Object.values(data[dk]).some(v=>v)).length;
+  document.getElementById('total-days').textContent=totalDays;
+  document.getElementById('total-check-days').textContent=totalDays;
+}
+
+function calcStreak(data){
+  let streak=0, d=new Date();
+  for(let i=0;i<200;i++){
+    const k=dateKey(d), day=data[k]||{}, done=HABITS.filter(h=>day[h]).length;
+    if(done>0) streak++;
+    else if(i>0) break;
+    d.setDate(d.getDate()-1);
+  }
+  return streak;
+}
+
+// HEATMAP
+function renderHeatmap(){
+  const data=getStorage(), grid=document.getElementById('heatmap-grid'), todayStr=todayKey();
+  const endDate = new Date('2026-11-18');
+  const totalDays = Math.max(1, Math.floor((endDate - START_DATE)/(24*60*60*1000))+1);
+  grid.innerHTML='';
+  for(let i=0;i<totalDays;i++){
+    const d=new Date(START_DATE); d.setDate(d.getDate()+i);
+    const k=dateKey(d), day=data[k]||{}, done=HABITS.filter(h=>day[h]).length;
+    const ratio=done/HABITS.length;
+    let cls='heatmap-cell';
+    if(ratio>=0.75) cls+=' h4';
+    else if(ratio>=0.5) cls+=' h3';
+    else if(ratio>=0.25) cls+=' h2';
+    else if(ratio>0) cls+=' h1';
+    if(k===todayStr) cls+=' today';
+    const cell=document.createElement('div');
+    cell.className=cls;
+    cell.title=`${d.getMonth()+1}/${d.getDate()} 完成${done}/8`;
+    cell.onclick=()=>openModal(k);
+    grid.appendChild(cell);
+  }
+}
+
+// CALENDAR
+function renderCalendar(){
+  const data=getStorage();
+  const label=['一月','二月','三月','四月','五月','六月','七月','八月','九月','十月','十一月','十二月'];
+  document.getElementById('cal-month-label').textContent=`${calYear}年 ${label[calMonth]}`;
+  const grid=document.getElementById('cal-grid');
+  grid.innerHTML='';
+  ['一','二','三','四','五','六','日'].forEach(d=>{
+    const el=document.createElement('div');
+    el.className='cal-dow'; el.textContent=d; grid.appendChild(el);
+  });
+  const firstDay=new Date(calYear,calMonth,1).getDay();
+  const offset=(firstDay+6)%7;
+  const daysInMonth=new Date(calYear,calMonth+1,0).getDate();
+  const todayStr=todayKey();
+  for(let i=0;i<offset;i++){
+    const el=document.createElement('div'); el.className='cal-day empty'; grid.appendChild(el);
+  }
+  for(let d=1;d<=daysInMonth;d++){
+    const k=`${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const day=data[k]||{}, done=HABITS.filter(h=>day[h]).length;
+    const el=document.createElement('div');
+    el.className='cal-day'+(done>0?' has-data':'')+(done===8?' full-day':'')+(k===todayStr?' today-cal':'');
+    const num=document.createElement('div'); num.className='cal-num'; num.textContent=d;
+    el.appendChild(num);
+    if(done>0){
+      const dots=document.createElement('div'); dots.className='cal-dots';
+      HABITS.filter(h=>day[h]).slice(0,5).forEach(h=>{
+        const dot=document.createElement('div');
+        dot.className='cal-dot'; dot.style.background=HABIT_COLORS[h];
+        dots.appendChild(dot);
+      });
+      el.appendChild(dots);
+      el.onclick=()=>openModal(k);
+    }
+    grid.appendChild(el);
+  }
+}
+
+function changeMonth(dir){
+  calMonth+=dir;
+  if(calMonth>11){calMonth=0;calYear++;}
+  if(calMonth<0){calMonth=11;calYear--;}
+  renderCalendar();
+}
+
+// STATS
+function renderStats(){
+  const data=getStorage();
+  const totalDays=Object.keys(data).filter(k=>Object.values(data[k]).some(v=>v)).length||1;
+  const grid=document.getElementById('stats-grid');
+  grid.innerHTML='';
+  HABITS.forEach(h=>{
+    const count=Object.values(data).filter(d=>d[h]).length;
+    const pct=Math.round(count/Math.max(totalDays,1)*100);
+    const card=document.createElement('div'); card.className='stat-card';
+    card.innerHTML=`<div class="stat-name"><div style="width:8px;height:8px;border-radius:50%;background:${HABIT_COLORS[h]};flex-shrink:0"></div>${HABIT_LABELS[h]}</div>
+    <div class="stat-pct">${pct}%</div>
+    <div class="stat-bar-bg"><div class="stat-bar-fill" style="width:${pct}%;background:${HABIT_COLORS[h]}"></div></div>
+    <div class="stat-nums"><span>${count} 天</span><span>共 ${totalDays} 天</span></div>`;
+    grid.appendChild(card);
+  });
+}
+
+// MODAL
+function openModal(k){
+  const data=getStorage(), day=data[k]||{};
+  const parts=k.split('-');
+  document.getElementById('modal-date').textContent=`${parts[0]}年${parseInt(parts[1])}月${parseInt(parts[2])}日`;
+  const body=document.getElementById('modal-body');
+  body.innerHTML='';
+  HABITS.forEach(h=>{
+    const done=!!day[h];
+    const item=document.createElement('div');
+    item.className='modal-item'+(done?' done-item':'');
+    item.innerHTML=`<div class="modal-dot ${done?'done':'undone'}"></div><div class="modal-item-label">${HABIT_LABELS[h]}</div><div style="margin-left:auto;font-size:12px;color:${done?'var(--purple)':'var(--text3)'}">${done?'✓ 完成':'—'}</div>`;
+    body.appendChild(item);
+  });
+  document.getElementById('modal-overlay').classList.add('open');
+}
+function closeModal(e){
+  if(!e||e.target===document.getElementById('modal-overlay'))
+    document.getElementById('modal-overlay').classList.remove('open');
+}
+
+// WEEKLY CURRICULUM DATA
+// 第一次開啟網頁的日期就是計畫開始日
+let START_DATE;
+(function(){
+  let stored = localStorage.getItem('plan_start_date');
+  if(!stored){
+    const t = new Date();
+    stored = t.getFullYear()+'-'+String(t.getMonth()+1).padStart(2,'0')+'-'+String(t.getDate()).padStart(2,'0');
+    localStorage.setItem('plan_start_date', stored);
+  }
+  START_DATE = new Date(stored);
+})();
+const CONCERT = new Date('2026-11-18'); // 計畫結束於11/18
+function getCurrentWeek(){
+  const now = new Date();
+  const diff = Math.floor((now - START_DATE) / (7*24*60*60*1000));
+  return Math.max(0, Math.min(diff, 23));
+}
+function getPlanDay(){
+  const now = new Date();
+  return Math.floor((now - START_DATE) / (24*60*60*1000)) + 1;
+}
+
+const INVEST_WEEKS = [
+  { week:1, title:'ETF基礎概念', points:[
+    {k:'ETF定義',d:'Exchange Traded Fund，在交易所上市的基金，可像股票一樣買賣。'},
+    {k:'指數基金',d:'追蹤特定指數（如台灣50大企業）表現的基金，不需人工選股。'},
+    {k:'成分股',d:'ETF裡面包含的個別股票，0050包含台灣最大50家公司。'},
+    {k:'追蹤誤差',d:'ETF實際表現與追蹤指數之間的差距，越小越好。'},
+    {k:'費用率（TER）',d:'每年從資產中扣除的管理費用比例，0050約0.46%，006208約0.19%。'},
+    {k:'市價 vs 淨值（NAV）',d:'市價是當下成交價，淨值是ETF實際資產價值，兩者接近代表合理。'},
+    {k:'被動投資',d:'不試圖打敗市場，只跟著市場走，長期績效通常優於主動選股。'},
+  ], tip:'ETF是新手最友善的投資工具，買一張等於分散風險買進一籃子股票。' },
+  { week:2, title:'台灣常見ETF全解析', points:[
+    {k:'0050 元大台灣50',d:'追蹤台灣市值最大50家公司，成立最久、流動性最好，年費用率約0.46%。'},
+    {k:'006208 富邦台50',d:'同樣追蹤台灣50指數但費用率只有0050的一半（約0.19%），規模較小。'},
+    {k:'00878 國泰永續高股息',d:'每季配息、納入ESG評分，近年最熱門的存股ETF，成分股約30支。'},
+    {k:'0056 元大高股息',d:'挑選未來一年預測股息殖利率最高的30支，每年10月配息一次。'},
+    {k:'00919 群益台灣精選高息',d:'每月配息，吸引需要現金流的投資人，但要注意成分股品質。'},
+    {k:'00713 元大台灣高息低波',d:'兼顧高股息和低波動，適合保守型投資人。'},
+    {k:'選ETF的三個標準',d:'費用率低、規模大（流動性好）、追蹤誤差小，這三點最重要。'},
+  ], tip:'0050和006208幾乎一樣但費用率差很多，長期下來差異相當可觀。' },
+  { week:3, title:'零股交易完整操作', points:[
+    {k:'零股定義',d:'不足一張（1000股）的股票，可以買1股起，大幅降低投資門檻。'},
+    {k:'盤後零股時間',d:'每個交易日13:40–14:30，這段時間掛單，14:30統一撮合成交。'},
+    {k:'盤中零股時間',d:'09:00–13:30也可交易，但每3秒撮合一次，成交不穩定。'},
+    {k:'市價單',d:'不指定價格，以當下市場價格成交，盤後零股建議用市價單確保成交。'},
+    {k:'限價單',d:'自己設定願意買入的最高價格，價格到才成交，可能無法成交。'},
+    {k:'T+2交割',d:'今天買，後天資金才正式扣款，帳戶要在T+2前確保有足夠資金。'},
+    {k:'手續費計算',d:'買賣各收0.1425%（最低1元），0050買1股約160元手續費約1元。'},
+    {k:'實際下單步驟',d:'開啟券商App→搜尋股票代號→選盤後零股→輸入股數→市價下單→確認。'},
+  ], tip:'第一次下單建議只買1–2股，熟悉流程後再加量，不要因為金額小就粗心。' },
+  { week:4, title:'定期定額策略深度解析', points:[
+    {k:'定期定額原理',d:'固定時間（如每月15日）買進固定金額，不管股價高低都執行。'},
+    {k:'平均成本法（DCA）',d:'Dollar Cost Averaging，長期買入後平均成本會趨於合理，不會買在最高點。'},
+    {k:'高點買少低點買多',d:'同樣1000元，股價高時買到的股數少，股價低時買到的股數多，自動攤低成本。'},
+    {k:'複利效果',d:'利滾利，股息再投入後下次領的股息更多，時間越長效果越驚人。'},
+    {k:'扣款日設定',d:'避開月初（薪水剛進帳容易衝動加碼）和月末（資金緊張），建議選10–20日。'},
+    {k:'停利不停損',d:'長期投資不需要設停損點，但可以設目標報酬率（如+30%）考慮是否部分獲利了結。'},
+    {k:'72法則',d:'72÷年化報酬率=本金翻倍年數。年化8%約需9年翻倍，10%約7.2年。'},
+    {k:'自動扣款設定',d:'大部分券商App有定期定額功能，設定好後每月自動執行，不需手動操作。'},
+  ], tip:'定期定額的魔法不在於選到好時機，而在於永遠不停止執行。' },
+  { week:5, title:'財務報表基礎數字', points:[
+    {k:'EPS（每股盈餘）',d:'公司每股賺了多少錢，EPS越高代表獲利能力越強，是評估個股的核心指標。'},
+    {k:'本益比P/E',d:'股價÷EPS，代表「花幾年獲利才值回股價」，一般認為15–20倍合理，越低越便宜。'},
+    {k:'股價淨值比P/B',d:'股價÷每股淨值，小於1代表股價低於公司實際資產價值，可能被低估。'},
+    {k:'殖利率',d:'每股股息÷股價×100%，代表投資報酬率，台灣高股息ETF通常5–8%。'},
+    {k:'配息率',d:'股息÷EPS，公司把多少獲利拿來配息，太高（>100%）代表在「借錢配息」要小心。'},
+    {k:'ROE（股東權益報酬率）',d:'公司用股東的錢賺了多少回報，一般認為15%以上是優質公司。'},
+    {k:'負債比率',d:'總負債÷總資產，比率越高代表借越多錢，超過60%要注意財務風險。'},
+    {k:'ETF不需要看個股財報',d:'投資ETF的優勢就是不用研究個股，只要了解整體市場趨勢即可。'},
+  ], tip:'ETF投資者不需要精通財報，但了解這些數字能幫助你更有信心持有。' },
+  { week:6, title:'K線圖完整入門', points:[
+    {k:'K線的四個價格',d:'開盤價（開）、最高價（高）、最低價（低）、收盤價（收），每根K線代表一段時間。'},
+    {k:'紅K（陽線）',d:'收盤價高於開盤價，代表這段時間上漲。紅色實體越長漲幅越大。'},
+    {k:'黑K/綠K（陰線）',d:'收盤價低於開盤價，代表這段時間下跌。'},
+    {k:'上影線',d:'K線上方的細線，代表曾漲到那個高點但最終沒守住，賣壓較重。'},
+    {k:'下影線',d:'K線下方的細線，代表曾跌到那個低點但反彈，買盤較強。'},
+    {k:'日線vs週線vs月線',d:'日線看短期、週線看中期、月線看長期趨勢，長期投資者主要看月線。'},
+    {k:'移動平均線（MA）',d:'一段時間的平均股價，常用20日、60日、120日均線判斷趨勢方向。'},
+    {k:'黃金交叉與死亡交叉',d:'短期均線由下往上穿越長期均線是買入訊號（黃金交叉），反之為賣出訊號。'},
+    {k:'長期投資者看K線的正確心態',d:'不是為了預測短期漲跌，而是判斷「現在整體趨勢是否仍向上」。'},
+  ], tip:'K線只是工具，不是水晶球，ETF長期投資者只需要確認月線趨勢向上即可。' },
+  { week:7, title:'股息配息完整知識', points:[
+    {k:'股息的本質',d:'公司把部分獲利分給股東，ETF也會把成分股配來的股息分給ETF持有者。'},
+    {k:'現金股利vs股票股利',d:'現金股利直接入帳，股票股利是配更多股票，ETF通常配現金。'},
+    {k:'除息日',d:'這天買進的投資人不享有這次股息，之前持有的才有。'},
+    {k:'除息後股價下跌',d:'股價會在除息日降低等同股息的金額，這不是虧損，是帳面上的移轉。'},
+    {k:'填息',d:'除息後股價回漲補回跌幅，填息越快代表公司體質越好。'},
+    {k:'殖利率計算',d:'年股息÷買入股價×100%，例如買100元的股票配5元股息，殖利率=5%。'},
+    {k:'股息再投入',d:'領到的股息馬上再買入同一支ETF，複利效果最大化，是長期投資的關鍵策略。'},
+    {k:'00878每季配息',d:'每年3、6、9、12月各配息一次，現金流較穩定，適合習慣固定收入的人。'},
+  ], tip:'「股息不是白賺的」是最重要的觀念，除息後股價下跌是正常現象。' },
+  { week:8, title:'風險控管完整策略', points:[
+    {k:'風險的定義',d:'不是「會虧錢」，而是「無法承受的虧損」，關鍵在於能否撐過低潮期。'},
+    {k:'緊急備用金',d:'至少6個月生活費放在定存或活存，這筆錢絕對不拿去投資。'},
+    {k:'閒錢投資原則',d:'只用「1–2年內絕對不需要動用」的資金投資，避免被迫在低點賣出。'},
+    {k:'分散投資',d:'不要把所有資金押在同一支股票，ETF本身就是分散，但也可以同時買幾支不同ETF。'},
+    {k:'股票vs債券配置',d:'股票波動大但長期報酬高，債券穩定但報酬低，兩者搭配可以降低整體波動。'},
+    {k:'最大回撤（Max Drawdown）',d:'投資組合從高點到最低點的跌幅，0050歷史最大回撤約-50%（2008年），要有心理準備。'},
+    {k:'停損的迷思',d:'長期投資ETF通常不需要停損，只要不是公司倒閉（ETF不會），跌了就等反彈。'},
+    {k:'定期定額自動降低風險',d:'不在單一高點投入大筆資金，是最簡單有效的風險控管策略。'},
+  ], tip:'最大的風險不是市場下跌，而是在最低點因為恐慌賣出，之後再看著它漲回去。' },
+  { week:9, title:'投資心理學與行為偏誤', points:[
+    {k:'追高殺低',d:'人類天性傾向在市場熱絡時買（高點），恐慌時賣（低點），正好相反。'},
+    {k:'損失厭惡',d:'心理學研究：虧損1000元的痛苦是賺1000元快樂的2倍，導致不敢停損或過早獲利了結。'},
+    {k:'確認偏誤',d:'傾向尋找支持自己想法的資訊，忽略反面意見，投資時要刻意看空方的論點。'},
+    {k:'市場先生（Mr. Market）',d:'巴菲特的老師葛拉漢提出，市場每天給你一個報價，你可以接受或忽略，不必隨它情緒波動。'},
+    {k:'恐懼與貪婪指數',d:'衡量市場情緒的指標，極度恐懼時往往是買入好時機，極度貪婪時要謹慎。'},
+    {k:'過度交易陷阱',d:'頻繁買賣會累積手續費和稅，長期下來嚴重侵蝕報酬，ETF持有越久越好。'},
+    {k:'錨定效應',d:'過度依賴第一個看到的數字（如買入價格），導致「不漲回買入價就不賣」的錯誤決策。'},
+    {k:'建立自己的投資SOP',d:'寫下何時買、買多少、什麼情況下賣，照SOP執行，不讓情緒干擾決策。'},
+  ], tip:'投資最難的不是分析，而是克服自己的心理弱點。知道這些偏誤存在就已經贏過大多數人。' },
+  { week:10, title:'台股交易機制完整知識', points:[
+    {k:'交易時間',d:'台股正常交易09:00–13:30，盤後定價交易13:35–14:30，零股盤後13:40–14:30。'},
+    {k:'漲跌幅限制',d:'台股每日漲跌幅最多±10%，防止單日暴漲暴跌，ETF也適用。'},
+    {k:'撮合機制',d:'買單和賣單在交易所配對成交，開盤用集合競價，盤中用逐筆撮合。'},
+    {k:'T+2交割',d:'今日買進，後天（T+2）資金才正式扣款入帳，賣出也是後天才收到款。'},
+    {k:'融資融券',d:'借錢買股（融資）或借股賣出（融券），長期投資者不建議使用，風險極高。'},
+    {k:'手續費',d:'買賣各收0.1425%，各券商可折扣，最低1元。網路下單通常有6折優惠。'},
+    {k:'證交稅',d:'賣出時收0.3%，ETF收0.1%（優惠稅率），買入不收。'},
+    {k:'股利所得稅',d:'台股領到的股息要計入個人所得申報，有兩種計算方式（合併計稅/分開計稅）選對可省稅。'},
+  ], tip:'了解交易機制不是為了頻繁操作，而是讓你知道錢的流向，建立完整的投資圖像。' },
+  { week:11, title:'海外ETF與美股入門', points:[
+    {k:'SPY',d:'追蹤S&P500（美國最大500家公司），是全球最大的ETF，費用率僅0.0945%。'},
+    {k:'QQQ',d:'追蹤Nasdaq100（科技股為主），包含蘋果、微軟、輝達等，波動比SPY大但長期報酬高。'},
+    {k:'VT Vanguard全球股票ETF',d:'涵蓋全球47個國家股市，一次分散到全世界，費用率0.07%。'},
+    {k:'VOO vs SPY',d:'同樣追蹤S&P500，但VOO費用率0.03%比SPY低很多，長期持有選VOO更划算。'},
+    {k:'複委託',d:'透過台灣券商買海外股票，方便但手續費較高，適合初學者。'},
+    {k:'海外券商（如Interactive Brokers）',d:'直接在海外開戶買美股，手續費極低，但操作門檻較高。'},
+    {k:'30%股息預扣稅',d:'台灣人從美國ETF領到的股息會被預扣30%稅，是海外投資的主要稅務成本。'},
+    {k:'匯率風險',d:'買美股需要換美元，如果台幣升值，換回台幣時會損失一部分報酬。'},
+  ], tip:'美股ETF長期報酬優秀，但匯率和稅務要納入考量，建議台股ETF先學會再擴展到海外。' },
+  { week:12, title:'資產配置完整策略', points:[
+    {k:'資產配置定義',d:'把資金分散到不同類型的資產（股票、債券、現金等），降低單一資產波動的影響。'},
+    {k:'股債配置',d:'股票高風險高報酬，債券低風險低報酬，搭配可以在市場下跌時緩衝損失。'},
+    {k:'年齡法則',d:'股票配置比例=110（或120）-年齡。25歲約85–95%股票，60歲約50–60%股票。'},
+    {k:'核心衛星策略',d:'80%資金放穩定ETF（核心），20%可放高成長或主題型ETF（衛星）增加彈性。'},
+    {k:'再平衡',d:'每半年或一年重新調整各資產比例回目標，在高點賣出、低點買入，自動執行逆向操作。'},
+    {k:'現金部位',d:'保留一定比例現金，遇到市場大跌時可以加碼，但現金太多會拖累整體報酬。'},
+    {k:'相關性',d:'不同資產類別的漲跌相關性越低越好，真正的分散是買「不會一起跌的東西」。'},
+    {k:'生命週期基金',d:'隨年齡自動調整股債比例的基金，適合不想自己再平衡的投資人。'},
+  ], tip:'資產配置沒有最好的答案，找到讓自己能安心睡著的比例才是最重要的。' },
+  { week:13, title:'投資帳戶管理與追蹤', points:[
+    {k:'庫存查詢',d:'在券商App查看持有的股票、股數、成本、現值，確認每筆投資的狀況。'},
+    {k:'損益計算',d:'（現值-成本）÷成本×100%=報酬率，注意要把手續費和稅也算進去。'},
+    {k:'年化報酬率',d:'把報酬率換算成每年的平均報酬，方便比較不同持有時間長度的投資績效。'},
+    {k:'XIRR計算',d:'用Excel的XIRR函數計算不規則現金流（定期定額）的真實報酬率，比單純報酬率更準確。'},
+    {k:'對帳單查看',d:'每月查看對帳單確認交割款項、股息入帳、手續費是否正確。'},
+    {k:'投資日誌',d:'記錄每次買賣的原因和當時市場狀況，事後回顧是最好的學習方式。'},
+    {k:'多久看一次帳戶',d:'長期投資者建議每月一次，每天看容易受情緒影響做出不理性決策。'},
+    {k:'績效比較基準',d:'你的報酬率要跟0050比較，不是跟定存比，這才是有意義的績效評估。'},
+  ], tip:'追蹤投資不是為了焦慮，而是為了確認策略有沒有偏離，保持客觀的記錄習慣很重要。' },
+  { week:14, title:'常見投資陷阱與詐騙', points:[
+    {k:'明牌陷阱',d:'被推薦的股票通常已經在高點，你買進後往往是幫別人抬轎，最後虧損出場。'},
+    {k:'Line群組詐騙',d:'在通訊軟體推薦投資標的、教你操作，幾乎100%是詐騙，切勿相信。'},
+    {k:'保證獲利',d:'任何投資都有風險，「保證獲利」或「穩賺不賠」是詐騙的標準話術。'},
+    {k:'高報酬高風險',d:'年化報酬超過15–20%的投資，背後必然有對應的高風險，不存在低風險高報酬。'},
+    {k:'槓桿ETF',d:'2倍或3倍槓桿ETF，短期漲跌放大，但長期會有「每日複利損耗」，不適合長期持有。'},
+    {k:'主題型ETF的風險',d:'追蹤特定產業（如AI、電動車）的ETF，產業退燒後可能長期低迷，要謹慎。'},
+    {k:'定期定額詐騙平台',d:'有些假平台讓你看到假的帳戶增值，等你想提款才發現無法出金。'},
+    {k:'正確管道',d:'只透過受金管會監管的合法券商投資，如元大、富邦、國泰、凱基等。'},
+  ], tip:'投資最重要的第一步是「不要虧損」，避開詐騙和高風險商品比選對標的更重要。' },
+  { week:15, title:'被動投資vs主動投資', points:[
+    {k:'被動投資',d:'只追蹤市場指數，不試圖選出「更好的股票」，費用低、長期績效穩定。'},
+    {k:'主動投資',d:'透過研究分析選出「會漲的股票」，需要大量時間和專業知識。'},
+    {k:'主動基金的現實',d:'研究顯示，超過80%的主動式基金10年後績效輸給指數，且費用更高。'},
+    {k:'基金管理費',d:'主動基金年費通常1–2%，ETF年費0.03–0.5%，長期下來差異驚人。'},
+    {k:'資訊效率市場假說',d:'市場已反映所有公開資訊，所以個人投資者很難持續「打敗市場」。'},
+    {k:'巴菲特的遺囑指示',d:'巴菲特告訴妻子他死後把90%遺產投入S&P500指數基金，是對被動投資最高的背書。'},
+    {k:'股神也推崇指數化投資',d:'巴菲特曾公開說對大多數投資人而言，定期買入低費用指數基金是最好的策略。'},
+    {k:'個股投資的學習價值',d:'了解個股不是壞事，但作為主要投資策略，初學者不建議從個股開始。'},
+  ], tip:'被動投資不是「放棄」，而是承認自己無法持續預測市場，選擇跟市場同行。' },
+  { week:16, title:'通貨膨脹與資產保值', points:[
+    {k:'通膨定義',d:'物價持續上漲，同樣的錢能買到的東西越來越少，購買力下降。'},
+    {k:'台灣通膨率',d:'長期平均約1–2%，近年因全球供應鏈問題曾升到3–4%。'},
+    {k:'定存的真相',d:'定存利率約1–2%，若低於通膨率，實際上是在讓財富縮水。'},
+    {k:'實質報酬率',d:'名目報酬率-通膨率=實質報酬率。股票長期年化報酬約8–10%，實質報酬約6–8%。'},
+    {k:'抗通膨資產',d:'股票（企業獲利會隨物價上漲）、房地產（實物資產）、黃金，三者都有抗通膨效果。'},
+    {k:'現金持有的成本',d:'把錢放在低利活存等於「每年慢慢虧損」，要把閒錢轉化為有效益的資產。'},
+    {k:'ETF的抗通膨能力',d:'追蹤整體股市的ETF長期報酬遠高於通膨，是最簡單有效的抗通膨工具。'},
+  ], tip:'理解通膨讓你明白「不投資本身也是一種風險」，每年坐著什麼都不做就是在虧損。' },
+  { week:17, title:'股市週期與景氣循環', points:[
+    {k:'牛市（Bull Market）',d:'股市持續上漲超過20%的時期，通常伴隨經濟擴張、企業獲利增加。'},
+    {k:'熊市（Bear Market）',d:'股市從高點下跌超過20%，通常伴隨經濟衰退，可能持續數月到數年。'},
+    {k:'景氣循環四階段',d:'復甦→擴張→過熱→衰退，每個完整循環約7–10年。'},
+    {k:'利率與股市的關係',d:'升息通常壓抑股市（資金成本上升），降息通常刺激股市（資金流入）。'},
+    {k:'Fed（美聯準會）的影響',d:'美國聯準會的利率決策影響全球股市，每次會議結果都要關注。'},
+    {k:'台股與美股的連動',d:'台股受美股影響很深，美股大跌通常台股跟著跌，但程度可能不同。'},
+    {k:'定期定額穿越週期',d:'不管景氣循環在哪個階段都持續買入，長期下來必然買到低點，這是定期定額最大優勢。'},
+    {k:'不要試圖預測市場',d:'即使是專業機構也無法準確預測市場底部和頂部，與其預測不如規律執行。'},
+  ], tip:'了解週期不是為了預測，而是在下一次崩盤時告訴自己「這很正常，之前也發生過，然後都漲回來了」。' },
+  { week:18, title:'稅務知識完整解析', points:[
+    {k:'台股免課資本利得稅',d:'台灣目前買賣股票賺的差價不需要繳稅，是台股投資的重要優勢。'},
+    {k:'股利所得計稅',d:'配息要申報所得稅，有「合併計稅」和「分開計稅（28%）」兩種方式，選對可省稅。'},
+    {k:'合併計稅',d:'股利加入綜合所得稅計算，稅率依個人所得稅率而定，高薪者稅率可能較高。'},
+    {k:'分開計稅（28%）',d:'股利單獨以28%稅率計算，適合綜合所得稅率超過28%的高收入者。'},
+    {k:'股利可扣抵稅額',d:'部分股利有附帶可扣抵稅額，申報時可抵減應繳稅額，記得申報。'},
+    {k:'海外所得基本稅額',d:'海外所得超過100萬且當年度基本稅額超過標準，需繳最低稅負，一般投資人影響不大。'},
+    {k:'記帳的重要性',d:'記錄每筆投資的買入成本、股息收入，報稅時才能正確計算，也方便追蹤績效。'},
+  ], tip:'台股免資本利得稅是很大的優勢，好好利用這個政策，等未來政策改變再調整策略。' },
+  { week:19, title:'財務目標設定', points:[
+    {k:'緊急備用金目標',d:'先存6個月生活費到活存，這是投資的前提，沒有備用金就不應該開始投資。'},
+    {k:'短期目標（1–3年）',d:'近期需要用到的錢（如旅遊、買電腦）不適合投資股市，放定存更安全。'},
+    {k:'中期目標（3–10年）',d:'如換車、頭期款，可以部分投入股市ETF，但要預留足夠緩衝時間。'},
+    {k:'長期目標（10年以上）',d:'退休金、財務自由，最適合股市投資，時間越長勝率越高。'},
+    {k:'儲蓄率',d:'月收入中存下來的比例，儲蓄率是決定財富積累速度最重要的因素，比選股更重要。'},
+    {k:'財務自由定義',d:'投資組合的4%可以覆蓋年生活費（4%法則），代表可以不依賴工作收入生活。'},
+    {k:'4%法則',d:'美國學者研究，每年從投資組合提取4%，歷史上很少在30年內耗盡，是退休提款的參考指標。'},
+    {k:'從現在開始的力量',d:'25歲開始每月投入3000元，假設年化8%，65歲可累積約1000萬，晚10年開始差距超過一倍。'},
+  ], tip:'財務目標要具體數字化，「想存很多錢」不如「35歲前存到100萬投資本金」更有執行力。' },
+  { week:20, title:'複利深度理解', points:[
+    {k:'複利公式',d:'本金×(1+利率)^年數，年化8%投資100萬，10年後約215萬，20年後約466萬，30年後約1006萬。'},
+    {k:'時間是最大變數',d:'複利的威力在時間，同樣100萬，30年的複利結果是10年的4倍以上。'},
+    {k:'再投入vs領出花掉',d:'股息再投入讓複利繼續運作，若每次領了就花掉，複利效果大打折扣。'},
+    {k:'費用率的複利效應',d:'年費率差1%，30年後資產差距可達25%以上，選低費率ETF非常重要。'},
+    {k:'月複利vs年複利',d:'定期定額每月投入，資金更快開始複利，比年初一次投入效果更好。'},
+    {k:'通膨對複利的侵蝕',d:'複利計算要扣除通膨才是真實的財富增長，名目報酬8%，實質報酬約6%。'},
+    {k:'複利需要的兩個條件',d:'時間（越長越好）和持續不中斷（遇到虧損繼續持有），缺一不可。'},
+  ], tip:'複利的最大敵人是「中途停止」，不論市場漲跌，持續投入才能讓複利發揮完整威力。' },
+  { week:21, title:'投資心態總複習', points:[
+    {k:'長期主義',d:'把投資期限設定為10–30年，短期漲跌就不再重要，心理壓力大幅降低。'},
+    {k:'市場會回來',d:'歷史上每一次股災（1929、1987、2000、2008、2020）最終都完全回復並創新高。'},
+    {k:'不要試圖擇時（Market Timing）',d:'研究顯示，錯過10個最佳交易日會讓10年報酬腰斬，留在市場比進出時機更重要。'},
+    {k:'降低關注頻率',d:'每天看帳戶不會讓你賺更多，只會增加焦慮和衝動交易的機率。'},
+    {k:'投資紀律',d:'事先設好規則並嚴格執行，不讓情緒干預決策，是長期成功的核心。'},
+    {k:'接受波動',d:'投資組合下跌20%是完全正常的，這不是虧損，是持有過程中必然經歷的起伏。'},
+    {k:'比較的陷阱',d:'不要和別人比較報酬率，每個人的風險承受度和投資目標不同，只跟自己的財務目標比較。'},
+    {k:'最簡單的策略往往最有效',d:'每月定期定額買0050，不需要複雜的技術分析，簡單反而勝過大多數人。'},
+  ], tip:'投資知識的終點不是「知道更多」，而是「做到看似簡單的事情並長期堅持」。' },
+  { week:22, title:'實際操作完整複習', points:[
+    {k:'下單流程複習',d:'開App→搜尋代號→選盤後零股→輸入股數→市價→確認→送出，每次操作都照這個步驟。'},
+    {k:'確認定期定額執行',d:'每月檢查定期定額是否正常扣款，帳戶餘額是否足夠，成交是否完成。'},
+    {k:'帳戶損益查看',d:'計算總投入、目前市值、損益金額和報酬率，和0050指數報酬比較。'},
+    {k:'股息入帳確認',d:'除息日後確認股息是否正確入帳，核對金額是否符合持有股數。'},
+    {k:'再平衡判斷',d:'若某一資產比例偏離目標超過5–10%，考慮是否需要買入其他資產調整比例。'},
+    {k:'年度稅務準備',d:'整理全年股息收入，準備5月申報所得稅，計算要用合併還是分開計稅。'},
+    {k:'建立投資日誌',d:'記錄每次操作的日期、金額、原因，以及當下的市場狀況和心理狀態。'},
+  ], tip:'投資是長跑，每一次認真的執行和記錄都是在建立你的財務習慣，比選股更重要。' },
+  { week:23, title:'進階資源與持續學習', points:[
+    {k:'《投資金律》威廉伯恩斯坦',d:'深入淺出解釋資產配置和投資歷史，是理解「為什麼分散投資」最好的書。'},
+    {k:'《漫步華爾街》柏頓墨基爾',d:'被動投資聖經，用大量歷史數據說明為什麼主動選股長期輸給指數。'},
+    {k:'CMoney理財網',d:'台灣股票資訊平台，ETF成分股、配息記錄、基本面數據都很完整，免費使用。'},
+    {k:'股感知識庫',d:'用白話文解釋投資概念，適合入門學習，文章品質穩定。'},
+    {k:'財報狗',d:'深度個股財務分析工具，要進入個股投資時的必備網站。'},
+    {k:'Mr.Market市場先生',d:'台灣知名投資部落格，ETF和被動投資教學內容豐富，觀念正確。'},
+    {k:'MoneyDJ理財網',d:'即時市場數據、ETF比較、基金資訊，適合日常查詢。'},
+    {k:'持續學習的心態',d:'投資知識沒有終點，每隔一段時間回頭複習基礎，往往會有新的體悟。'},
+  ], tip:'好的書和網站能加速你的學習，但最終讓你進步的是實際操作和從錯誤中學習。' },
+  { week:24, title:'24週學習總結', points:[
+    {k:'你學到了什麼',d:'從ETF基礎到複利、稅務、心理學，你已經具備了開始長期投資的完整知識基礎。'},
+    {k:'目前投資狀況確認',d:'確認定期定額是否正常執行，目前報酬率如何，是否符合預期。'},
+    {k:'下一步計劃',d:'是否要擴大金額、增加標的，或開始研究海外ETF，制定接下來的投資計劃。'},
+    {k:'最重要的一句話',d:'開始比完美更重要，持續比開始更重要，時間比選股更重要。'},
+    {k:'繼續定期定額',d:'24週只是開始，真正的財富積累在接下來的10–30年，持續執行才是關鍵。'},
+  ], tip:'恭喜完成24週投資課程！你現在比大多數人都更了解投資。保持定期定額，讓時間幫你工作 💜' },
+];
+
+const KOREAN_WEEKS = [
+  { week:1, title:'韓文字母：基本母音10個', points:[
+    {k:'ㅏ a（阿）',d:'嘴巴張開發「阿」的音，例：아（阿，感嘆詞）'},
+    {k:'ㅓ eo（哦）',d:'嘴巴半開，像說英文"uh"，例：어（哦/語助詞）'},
+    {k:'ㅗ o（歐）',d:'嘴唇圓而突出，例：오（五）'},
+    {k:'ㅜ u（烏）',d:'嘴唇更突出圓收，例：우（牛/右）'},
+    {k:'ㅡ eu（ㄜ）',d:'嘴唇橫拉，類似台語「ㄜ」，例：으（語尾助詞）'},
+    {k:'ㅣ i（衣）',d:'嘴角橫拉，發「衣」，例：이（這/牙齒）'},
+    {k:'ㅔ e（欸）',d:'類似英文「bed」的e，例：에（在/的）'},
+    {k:'ㅐ ae（欸）',d:'現代韓文和ㅔ幾乎相同，例：개（狗）'},
+    {k:'ㅑ ya',d:'在ㅏ前加y的音，例：야（喂！）'},
+    {k:'ㅛ yo',d:'在ㅗ前加y的音，例：요（禮貌語尾）'},
+    {k:'ㅠ yu',d:'在ㅜ前加y的音，例：유（油/有）'},
+    {k:'ㅕ yeo',d:'在ㅓ前加y的音，例：여（女）'},
+    {k:'ㅘ wa',d:'複合母音，ㅗ+ㅏ，例：와（哇/和）'},
+    {k:'ㅝ wo',d:'複合母音，ㅜ+ㅓ，例：워（worker的wor）'},
+    {k:'ㅢ ui',d:'複合母音，ㅡ+ㅣ，例：의（的/醫）'},
+  ], tip:'先把前6個基本母音背到反射，其他的慢慢加，每天對著鏡子練習嘴型。' },
+  { week:2, title:'韓文字母：子音與拼音規則', points:[
+    {k:'ㄱ g/k',d:'字首發g，字尾發k，例：가（去）、학（學）'},
+    {k:'ㄴ n',d:'鼻音，例：나（我）、한（韓）'},
+    {k:'ㄷ d/t',d:'字首發d，字尾發t，例：다（全部）'},
+    {k:'ㄹ r/l',d:'字首像英文r，字尾像l，例：라（羅/啦）'},
+    {k:'ㅁ m',d:'雙唇閉合，例：마（馬/媽）'},
+    {k:'ㅂ b/p',d:'字首發b，字尾發p，例：바（海浪/바다의 바）'},
+    {k:'ㅅ s',d:'前面有母音時發sh，例：시（時/詩）'},
+    {k:'ㅇ 無音/ng',d:'字首裝飾用不發音，字尾發ng，例：아（阿），앙（ng音）'},
+    {k:'ㅈ j',d:'例：자（자，字/睡）'},
+    {k:'ㅋ k（送氣）',d:'比ㄱ更用力送氣，例：카（卡/咖）'},
+    {k:'ㅌ t（送氣）',d:'比ㄷ更用力送氣，例：타（打/他）'},
+    {k:'ㅍ p（送氣）',d:'比ㅂ更用力送氣，例：파（葱/波）'},
+    {k:'ㅊ ch',d:'例：차（茶/車）'},
+    {k:'ㅎ h',d:'例：하（做/下）、한（韓）'},
+    {k:'拼音規則：初聲+中聲+終聲',d:'每個字由子音（初聲）+母音（中聲）+可選子音（終聲/收音）組成，例：한=ㅎ+ㅏ+ㄴ'},
+  ], tip:'方탄소년단（BTS）拆開練習：방=ㅂ+ㅏ+ㅇ，탄=ㅌ+ㅏ+ㄴ，소=ㅅ+ㅗ，년=ㄴ+ㅕ+ㄴ，단=ㄷ+ㅏ+ㄴ' },
+  { week:3, title:'硬音、激音與發音規則', points:[
+    {k:'硬音ㄲ',d:'比ㄱ更緊，喉嚨用力憋住氣再發，例：까（更燒）、꽃（花）'},
+    {k:'硬音ㄸ',d:'比ㄷ更緊，例：따（跟隨）、딸（女兒）'},
+    {k:'硬音ㅃ',d:'比ㅂ更緊，例：빠（快）、빠르다（速度快）'},
+    {k:'硬音ㅆ',d:'比ㅅ更緊，例：쌀（米）、씨（種子/先生）'},
+    {k:'硬音ㅉ',d:'比ㅈ更緊，例：짜（鹹）、짜증（煩躁）'},
+    {k:'連音化',d:'收音後接母音開頭的字，收音移到下一個字發音，例：음악→으막（音樂）'},
+    {k:'鼻音化',d:'ㄱ、ㄷ、ㅂ在鼻音ㄴ、ㅁ前變成鼻音，例：학년→항년（學年）'},
+    {k:'流音化',d:'ㄴ在ㄹ前後都變成ㄹ，例：신라→실라（新羅）'},
+    {k:'激音化',d:'ㅎ與ㄱ、ㄷ、ㅂ、ㅈ相遇，合成激音，例：좋다→조타'},
+    {k:'口蓋音化',d:'ㄷ、ㅌ在이前變成ㅈ、ㅊ，例：같이→가치（一起）'},
+    {k:'실전 발음：방탄소년단',d:'실제 발음（實際發音）：방탄소년단 注意ㄴ和다的連接'},
+  ], tip:'發音規則不需要全背起來，大量聽BTS說話，耳朵自然會習慣實際發音。' },
+  { week:4, title:'基礎問候與自我介紹', points:[
+    {k:'안녕하세요',d:'您好（正式），任何場合都可以用，BTS見到ARMY必說這句。'},
+    {k:'안녕（非正式）',d:'嗨/掰掰，朋友間使用，BTS成員互相打招呼常用。'},
+    {k:'처음 뵙겠습니다',d:'初次見面（最正式），第一次見面時使用。'},
+    {k:'저는 ~이에요/예요',d:'我是~，接有收音的名字用이에요，接無收音的名字用예요。'},
+    {k:'이름이 뭐예요？',d:'你叫什麼名字？（一般尊敬），直接問對方名字。'},
+    {k:'성함이 어떻게 되세요？',d:'請問貴姓大名？（最正式），對長輩或初次見面的人使用。'},
+    {k:'잘 부탁드립니다',d:'請多指教，BTS在演唱會開場必說，表示希望大家多照顧。'},
+    {k:'반갑습니다',d:'很高興認識你，正式場合使用。'},
+    {k:'만나서 반가워요',d:'見到你很高興（口語一般尊敬），比반갑습니다更自然。'},
+    {k:'오랜만이에요',d:'好久不見，BTS回歸時常說。'},
+    {k:'잘 지냈어요？',d:'你過得好嗎？見面時的問候。'},
+    {k:'네，잘 지냈어요',d:'是的，過得很好（回應）。'},
+    {k:'저도요',d:'我也是，簡短的回應方式。'},
+    {k:'한국어를 배우고 있어요',d:'我在學韓文，如果遇到韓國人可以說這句。'},
+  ], tip:'把「안녕하세요」和「잘 부탁드립니다」練到反射，這是演唱會上最常聽到的兩句。' },
+  { week:5, title:'數字系統完整學習', points:[
+    {k:'漢字數字1–10',d:'일(1) 이(2) 삼(3) 사(4) 오(5) 육(6) 칠(7) 팔(8) 구(9) 십(10)'},
+    {k:'漢字數字11–100',d:'십일(11) 이십(20) 삼십(30)... 백(100)，十位+個位直接組合。'},
+    {k:'漢字數字使用場合',d:'時間（分鐘）、日期、電話號碼、樓層、金錢、號碼，幾乎所有數字場合。'},
+    {k:'固有數字1–10',d:'하나(1) 둘(2) 셋(3) 넷(4) 다섯(5) 여섯(6) 일곱(7) 여덟(8) 아홉(9) 열(10)'},
+    {k:'固有數字使用場合',d:'計算個數（個、杯、張等量詞）、年齡（~살），只用到99。'},
+    {k:'時間說法',d:'~시（點，固有數字）~분（分，漢字數字），例：세 시 삼십 분=3點30分。'},
+    {k:'몇 시예요？',d:'現在幾點？日常最常問的問題之一。'},
+    {k:'오전/오후',d:'上午/下午，例：오후 두 시=下午2點。'},
+    {k:'年齡說法',d:'~살이에요，例：스물다섯 살이에요=我25歲，注意25要用고유수사（스물다섯）。'},
+    {k:'날짜 읽기（日期讀法）',d:'~월 ~일，月份和日期都用漢字數字，例：유월 십일 일=6月10日。'},
+    {k:'요일（星期）',d:'월(一) 화(二) 수(三) 목(四) 금(五) 토(六) 일(日)，後面加요일=星期~。'},
+    {k:'얼마예요？',d:'多少錢？購物必問，金錢都用漢字數字。'},
+  ], tip:'一定要分清楚「時間和個數用哪套數字」，記住：時間的「點」用固有，「分」用漢字。' },
+  { week:6, title:'日常動詞30個', points:[
+    {k:'가다→가요（去）',d:'어디 가요？你要去哪裡？'},
+    {k:'오다→와요（來）',d:'와！你來了！（感嘆）或여기 와요 來這裡。'},
+    {k:'먹다→먹어요（吃）',d:'뭐 먹어요？你吃什麼？'},
+    {k:'마시다→마셔요（喝）',d:'물 마셔요 喝水。'},
+    {k:'자다→자요（睡）',d:'잘 자요 晚安/好好睡。'},
+    {k:'일어나다→일어나요（起床）',d:'일어나！起床了！'},
+    {k:'하다→해요（做）',d:'뭐 해요？你在做什麼？'},
+    {k:'보다→봐요（看）',d:'영화 봐요 看電影。'},
+    {k:'듣다→들어요（聽）',d:'음악 들어요 聽音樂。'},
+    {k:'말하다→말해요（說）',d:'한국어로 말해요 用韓文說。'},
+    {k:'알다→알아요（知道）',d:'알아요！我知道！'},
+    {k:'모르다→몰라요（不知道）',d:'몰라요 我不知道。'},
+    {k:'좋아하다→좋아해요（喜歡）',d:'BTS 좋아해요 我喜歡BTS。'},
+    {k:'싫어하다→싫어해요（討厭）',d:'야채 싫어해요 我討厭蔬菜。'},
+    {k:'있다→있어요（有/在）',d:'시간 있어요？你有時間嗎？'},
+    {k:'없다→없어요（沒有/不在）',d:'시간 없어요 沒有時間。'},
+    {k:'만나다→만나요（見面）',d:'오늘 만나요 今天見面。'},
+    {k:'앉다→앉아요（坐）',d:'여기 앉아요 坐這裡。'},
+    {k:'서다→서요（站）',d:'거기 서요 站在那裡。'},
+    {k:'웃다→웃어요（笑）',d:'웃어요！笑一個！'},
+  ], tip:'這20個動詞覆蓋了日常80%的動作，每個都要練到「聽到韓文馬上知道意思」。' },
+  { week:7, title:'形容詞與描述詞30個', points:[
+    {k:'좋다→좋아요（好/喜歡）',d:'오늘 날씨 좋아요 今天天氣很好。'},
+    {k:'나쁘다→나빠요（壞/不好）',d:'이거 나빠요 這個不好。'},
+    {k:'크다→커요（大）',d:'눈이 커요 眼睛很大。'},
+    {k:'작다→작아요（小）',d:'이 옷이 작아요 這件衣服太小。'},
+    {k:'많다→많아요（多）',d:'사람이 많아요 人很多。'},
+    {k:'적다→적어요（少）',d:'시간이 적어요 時間很少。'},
+    {k:'빠르다→빨라요（快）',d:'노래가 빨라요 歌很快。'},
+    {k:'느리다→느려요（慢）',d:'말이 느려요 說話很慢。'},
+    {k:'쉽다→쉬워요（容易）',d:'한국어 쉬워요？韓文容易嗎？'},
+    {k:'어렵다→어려워요（難）',d:'발음이 어려워요 發音很難。'},
+    {k:'예쁘다→예뻐요（漂亮）',d:'아미가 예뻐요 ARMY很漂亮。'},
+    {k:'귀엽다→귀여워요（可愛）',d:'정말 귀여워요！真的好可愛！'},
+    {k:'멋있다→멋있어요（帥/酷）',d:'너무 멋있어요！太帥了！'},
+    {k:'재미있다→재미있어요（有趣）',d:'콘서트가 재미있어요 演唱會很有趣。'},
+    {k:'재미없다→재미없어요（無聊）',d:''},
+    {k:'맛있다→맛있어요（好吃）',d:'맛있어요！好吃！'},
+    {k:'맛없다→맛없어요（難吃）',d:''},
+    {k:'힘들다→힘들어요（辛苦/累）',d:'너무 힘들어요 太辛苦了。'},
+    {k:'행복하다→행복해요（幸福）',d:'지금 행복해요 現在很幸福。'},
+    {k:'슬프다→슬퍼요（悲傷）',d:'왜 슬퍼요？為什麼難過？'},
+  ], tip:'先把「좋아요、멋있어요、귀여워요、재미있어요」練熟，演唱會上可以大聲跟著說。' },
+  { week:8, title:'敬語與語體完整說明', points:[
+    {k:'韓文語體系統概覽',d:'韓文根據對象和場合有不同的說話方式，主要分：格式體（합쇼체）、非格式尊稱（해요체）、半語（해체）。'},
+    {k:'합쇼체（格式尊稱）',d:'最正式，用於新聞播報、正式場合，動詞以-ㅂ니다/습니다結尾，例：합니다、감사합니다。'},
+    {k:'해요체（非格式尊稱）',d:'日常對陌生人/長輩最常用，在字尾加요，例：해요、가요、먹어요，BTS演唱會主要使用這個。'},
+    {k:'해체（半語）',d:'對朋友/晚輩使用，去掉요，例：해、가、먹어，BTS成員互相說話常用。'},
+    {k:'-ㄹ게요（意志/承諾）',d:'我會~、我要~，例：잘 할게요 我會好好做，올게요 我會來。'},
+    {k:'-고 싶어요（想要）',d:'我想~，例：보고 싶어요 我想見你，먹고 싶어요 我想吃。'},
+    {k:'-아/어 주세요（請~）',d:'請幫我~，例：봐 주세요 請看，들어 주세요 請聆聽。'},
+    {k:'-겠어요（推測/意志）',d:'應該~、我將~，例：모르겠어요 我不確定，하겠습니다 我將會做。'},
+    {k:'-네요（感嘆/驚訝）',d:'原來如此/真的啊，例：예쁘네요 真漂亮耶，맛있네요 真好吃耶。'},
+    {k:'-죠？（對吧？）',d:'確認語氣，例：맞죠？對吧？아미죠？你是ARMY對吧？'},
+    {k:'-잖아요（你不知道嗎）',d:'帶有「這很明顯吧」語氣，例：좋잖아요 這很好啊。'},
+    {k:'-거든요（因為/解釋）',d:'解釋或提供背景資訊，例：바쁘거든요 因為我很忙。'},
+  ], tip:'先把해요체練熟，這是日常生活和演唱會上最常聽到的語體。' },
+  { week:9, title:'情感與感受表達', points:[
+    {k:'기뻐요（開心）',d:'너무 기뻐요！太開心了！演唱會上成員常說。'},
+    {k:'슬퍼요（難過）',d:'왜 슬퍼요？為什麼難過？'},
+    {k:'설레요（心動/期待）',d:'많이 설레요 很期待，콘서트 전에 설레요 演唱會前很期待。'},
+    {k:'떨려요（緊張/激動）',d:'너무 떨려요 好緊張，兩種意思要看情境分辨。'},
+    {k:'그리워요（思念）',d:'아미가 그리워요 想念ARMY，BTS長期不見ARMY時常說。'},
+    {k:'보고 싶어요（想見）',d:'너무 보고 싶었어요 我太想你了，BTS對ARMY說的經典句子。'},
+    {k:'감동이에요（很感動）',d:'정말 감동이에요 真的很感動，演唱會上必出現。'},
+    {k:'행복해요（很幸福）',d:'아미 덕분에 행복해요 因為有ARMY所以很幸福。'},
+    {k:'고마워요（謝謝，輕鬆版）',d:'고마워요 比감사합니다更輕鬆隨意，對친구說的謝謝。'},
+    {k:'미안해요（對不起，輕鬆版）',d:'比죄송합니다更輕鬆，朋友間的道歉。'},
+    {k:'좋아요（喜歡/好）',d:'아미 좋아요 喜歡ARMY，萬用的積極回應。'},
+    {k:'사랑해요（愛你）',d:'아미 사랑해요 愛你ARMY，演唱會結尾必說。'},
+    {k:'사랑합니다（愛你，正式）',d:'比사랑해요更鄭重，BTS在正式場合會用。'},
+    {k:'영원히 사랑할게요',d:'我會永遠愛你，BTS對ARMY的承諾。'},
+  ], tip:'把보고 싶었어요、감동이에요、사랑해요這三句練到聽到就能理解，演唱會上100%會聽到。' },
+  { week:10, title:'副詞與語氣強化詞', points:[
+    {k:'정말（真的/真心）',d:'정말 좋아요 真的很好，比진짜更書面一點。'},
+    {k:'진짜（真的）',d:'口語最常用，진짜？真的嗎？진짜야！是真的！'},
+    {k:'너무（太/非常）',d:'原意是「過度」，口語已變成「非常」，너무 좋아 太好了！'},
+    {k:'매우（非常，書面）',d:'比너무更正式，一般口語少用。'},
+    {k:'아주（非常）',d:'아주 잘했어요 做得非常好！'},
+    {k:'좀（一點/稍微/請）',d:'좀 도와주세요 請幫我一下，也可表示「稍微」。'},
+    {k:'많이（很多/非常）',d:'많이 먹었어요 吃很多，많이 사랑해요 非常愛你。'},
+    {k:'조금（一點點）',d:'조금 어려워요 有一點點難。'},
+    {k:'빨리（快點）',d:'빨리빨리 快快快！韓國文化的代表詞之一。'},
+    {k:'천천히（慢慢）',d:'천천히 말해 주세요 請說慢一點。'},
+    {k:'같이/함께（一起）',d:'같이 해요！一起來！演唱會上互動必說。'},
+    {k:'모두（全部/大家）',d:'모두 같이！大家一起！'},
+    {k:'다시（再次）',d:'다시 한번 再一次，다시 만나요 再見。'},
+    {k:'이미（已經）',d:'이미 알아요 已經知道了。'},
+    {k:'아직（還/尚未）',d:'아직 몰라요 還不知道，아직 있어요 還在。'},
+  ], tip:'너무、진짜、많이這三個詞在韓文口語中出現頻率極高，先把它們記熟。' },
+  { week:11, title:'疑問詞與問句', points:[
+    {k:'뭐/무엇（什麼）',d:'뭐 먹어요？你吃什麼？뭐가 좋아요？什麼比較好？'},
+    {k:'누구（誰）',d:'누구예요？是誰？이게 누구 거예요？這是誰的？'},
+    {k:'어디（哪裡）',d:'어디 가요？去哪裡？어디서 왔어요？你從哪裡來？'},
+    {k:'언제（什麼時候）',d:'언제 와요？什麼時候來？콘서트가 언제예요？演唱會什麼時候？'},
+    {k:'왜（為什麼）',d:'왜요？為什麼啊？왜 그래요？你為什麼這樣？'},
+    {k:'어떻게（怎麼）',d:'어떻게 해요？怎麼做？어떻게 생각해요？你怎麼想？'},
+    {k:'어떤（哪種/什麼樣的）',d:'어떤 노래 좋아해요？你喜歡哪種歌？'},
+    {k:'몇（幾）',d:'몇 시예요？幾點？몇 명이에요？幾個人？'},
+    {k:'얼마（多少錢）',d:'얼마예요？多少錢？'},
+    {k:'얼마나（多~）',d:'얼마나 좋아요？有多喜歡？얼마나 걸려요？需要多久？'},
+    {k:'~이/가 뭐예요？',d:'~是什麼？入門必會句型。'},
+    {k:'~이/가 어디에 있어요？',d:'~在哪裡？找東西的時候用。'},
+    {k:'~이/가 있어요？（有~嗎？）',d:'시간 있어요？有時間嗎？'},
+    {k:'혹시（不知道是否/請問）',d:'혹시 아미세요？請問你是ARMY嗎？語氣較委婉。'},
+  ], tip:'這些疑問詞要練到反射，在現場聽到成員問問題時，能馬上知道他在問什麼。' },
+  { week:12, title:'演唱會場景用語完整版', points:[
+    {k:'소리 질러！',d:'大聲喊出來！演唱會最常出現的煽動口號。'},
+    {k:'따라 해 주세요！',d:'請跟我一起做！帶動粉絲互動時使用。'},
+    {k:'손 들어 주세요！',d:'請舉手！要和觀眾互動時常說。'},
+    {k:'다 같이！',d:'大家一起！'},
+    {k:'준비됐어요？',d:'準備好了嗎？正式開始前的問句。'},
+    {k:'여러분，감사합니다',d:'大家，謝謝你們，演唱會上對觀眾的感謝。'},
+    {k:'아미 덕분에',d:'多虧了ARMY，感謝粉絲的慣用語。'},
+    {k:'오늘 정말 즐거웠어요',d:'今天真的很開心，演唱會結尾必說。'},
+    {k:'앞으로도 잘 부탁드립니다',d:'以後也請多關照，表示長期的請託。'},
+    {k:'다음에 또 만나요',d:'下次再見，告別語。'},
+    {k:'건강하게 지내세요',d:'請保重身體，關心粉絲的說法。'},
+    {k:'행복하게 살아요',d:'請幸福地生活，BTS常說的祝福語。'},
+    {k:'우리 오래오래 함께해요',d:'我們一起走很久很久，BTS和ARMY之間的承諾。'},
+    {k:'아미가 최고야！',d:'ARMY最棒了！成員誇讚粉絲時說。'},
+    {k:'보고 싶을 거예요',d:'會想你的，演唱會後的告別語。'},
+    {k:'사랑합니다，아미！',d:'愛你ARMY！最後的謝幕語。'},
+  ], tip:'把這些句子抄在小紙上帶去演唱會，聽到時打勾，看看能聽懂幾句！' },
+  { week:13, title:'成員互動與鬥嘴用語', points:[
+    {k:'야！（喂！）',d:'叫人、表示驚訝或吐槽，BTS成員互叫時最常用。'},
+    {k:'왜 그래요/왜 그래',d:'你幹嘛這樣/你怎麼了，表示不理解對方行為。'},
+    {k:'진짜？（真的假的）',d:'表示驚訝或懷疑，語調上揚。'},
+    {k:'헐（天啊/OMG）',d:'驚訝、無語的感嘆詞，類似英文OMG。'},
+    {k:'대박！（太厲害了！）',d:'表示震驚、讚嘆，是最常見的驚嘆詞。'},
+    {k:'웃기지 마（別鬧了）',d:'表示不信或吐槽，半開玩笑的語氣。'},
+    {k:'말도 안 돼（不可能/無稽之談）',d:'字面意思是「話說不通」，表示難以置信。'},
+    {k:'뭐라고요？（你說什麼？）',d:'沒聽清楚或難以置信時的回應。'},
+    {k:'아 진짜（啊真的）',d:'帶有無奈、驚訝、確認語氣，非常口語。'},
+    {k:'왜요？（為什麼？）',d:'疑問或輕微抗議的語氣。'},
+    {k:'아 이거 왜 이래',d:'啊這是怎麼回事，表示困惑或無奈。'},
+    {k:'너무해요（太過分了）',d:'表示對方做得太過分，帶有抱怨語氣。'},
+    {k:'괜찮아요？（你還好嗎？）',d:'關心對方的問句，也可回應「我沒事」。'},
+    {k:'고마워（謝謝，半語）',d:'對朋友說謝謝，比고마워요更親近。'},
+    {k:'미안（對不起，半語）',d:'對朋友道歉，比미안해요更輕鬆。'},
+  ], tip:'看Run BTS時對照這些詞，你會發現每集都能聽到至少一半以上！' },
+  { week:14, title:'BTS歌曲常見詞彙', points:[
+    {k:'꿈（夢想）',d:'꿈을 꾸다（做夢）、꿈을 향해（朝著夢想），BTS歌詞最常出現的詞。'},
+    {k:'빛（光）',d:'빛나다（發光）、네 빛이 돼줄게（我要成為你的光），Many歌曲的意象。'},
+    {k:'별（星星）',d:'별이 되다（成為星星），Mikrokosmos等歌曲常見。'},
+    {k:'길（路/方向）',d:'내 길을 걷겠어（我要走自己的路），Spring Day等歌曲。'},
+    {k:'시간（時間）',d:'시간이 지나도（即使時間流逝），許多歌曲中的元素。'},
+    {k:'마음（心/心意）',d:'내 마음（我的心），마음이 아파（心裡很痛）。'},
+    {k:'눈물（眼淚）',d:'눈물이 나다（流眼淚），많은 가사에 나와요。'},
+    {k:'웃음（笑/笑容）',d:'웃음이 피다（笑容綻放），和눈물常一起出現。'},
+    {k:'함께（一起）',d:'함께 해요（一起做），BTS強調與ARMY共同走過的核心詞彙。'},
+    {k:'영원（永遠）',d:'영원히 사랑해（永遠愛你），영원할 것 같았어（感覺會永遠）。'},
+    {k:'청춘（青春）',d:'우리의 청춘（我們的青春），BTS很多作品圍繞青春主題。'},
+    {k:'상처（傷口）',d:'상처를 치유하다（療癒傷口），許多歌曲關於傷痛與成長。'},
+    {k:'소우주（小宇宙）',d:'Mikrokosmos歌名，每個人都是閃亮的小宇宙。'},
+    {k:'Boy with Luv（작은 것들을 위한 시）',d:'為渺小事物的詩，歌名本身是關鍵詞。'},
+  ], tip:'在學韓文的同時多聽BTS的歌，認出歌詞裡的單字，是最有動力的學習方式。' },
+  { week:15, title:'聽力技巧與策略', points:[
+    {k:'影子跟讀法（Shadowing）',d:'跟著音頻同步模仿發音和語調，是最有效的口語和聽力訓練方法之一。'},
+    {k:'Shadowing步驟',d:'1.先看字幕聽一遍→2.跟著唸一遍→3.不看字幕跟著唸→4.只聽不跟唸，每段約10–15秒。'},
+    {k:'精聽vs泛聽',d:'精聽：反覆聽同一段直到完全聽懂。泛聽：大量接觸，不求全懂只求培養語感。'},
+    {k:'抓關鍵詞策略',d:'不必每個字都懂，只要抓住主詞+動詞就能理解大意，這是聽力的核心技能。'},
+    {k:'語速適應',d:'從慢速（TTMIK教學）到正常速（新聞）到快速（口語對話），逐步適應。'},
+    {k:'BTS最佳聽力素材',d:'In the SOOP（語速慢）→Run BTS（口語豐富）→Weverse Live（最自然）。'},
+    {k:'關掉中文字幕',d:'看過有中文字幕的版本後，一定要再看一次只開韓文字幕或完全不開，強迫大腦聽韓文。'},
+    {k:'建立「BTS詞庫」Anki牌組',d:'每次聽到新詞就加進去，這樣Anki複習的都是你真實聽到的詞，記憶效果更好。'},
+    {k:'Naver字典',d:'遇到不懂的詞馬上查，有真人發音，韓英韓字典都有，是最實用的查詞工具。'},
+    {k:'聽寫練習',d:'把聽到的內容寫下來，對照字幕，找出哪些詞聽不出來，針對性練習。'},
+    {k:'重複聽同一段',d:'同一段MC或對話聽10遍以上，每次都能聽懂更多，這是聽力進步最快的方法。'},
+    {k:'不要太早放棄',d:'聽力需要積累，前3個月可能感覺沒進步，但突然有一天會突破，繼續堅持。'},
+  ], tip:'每天30分鐘的聽力練習比每週一次3小時更有效，頻率比時間長度更重要。' },
+  { week:16, title:'語法結構：連結句子', points:[
+    {k:'그리고（然後/還有）',d:'連接兩個句子或詞，例：노래도 좋고 춤도 좋아요。（歌好舞也好）'},
+    {k:'그런데/근데（但是/話說）',d:'轉折或開啟新話題，근데是口語版，例：근데 왜요？話說為什麼？'},
+    {k:'그래서（所以）',d:'표現因果關係，例：늦었어요，그래서 빨리 왔어요。（遲到了所以趕快來）'},
+    {k:'그러나/하지만（但是）',d:'書面轉折，比그런데更正式。'},
+    {k:'아니면（或是/還是）',d:'選擇疑問句常用，이거예요，아니면 저거예요？是這個還是那個？'},
+    {k:'~때문에（因為~）',d:'原因說明，아미 때문에 살아요。（因為ARMY而活著）'},
+    {k:'~(이)라서（因為是~）',d:'아미라서 행복해요。（因為是ARMY所以幸福）'},
+    {k:'~도（也）',d:'나도 좋아해요。（我也喜歡）저도요。（我也是）'},
+    {k:'~만（只/僅）',d:'너만 있으면 돼。（只要有你就好）'},
+    {k:'~부터 ~까지（從~到~）',d:'처음부터 끝까지（從頭到尾）'},
+    {k:'~전에（~之前）',d:'콘서트 전에（演唱會之前）'},
+    {k:'~후에（~之後）',d:'콘서트 후에（演唱會之後）'},
+    {k:'~면/으면（如果~的話）',d:'아미면 알아요。（如果是ARMY就知道）'},
+  ], tip:'這些連接詞讓你從只聽懂片段詞彙，進化到能理解整句話的邏輯結構。' },
+  { week:17, title:'BTS成員個人用語特色', points:[
+    {k:'RM（남준）的說話特色',d:'用詞豐富、思考深度高，常說철학적인（哲學性的）詞彙，也喜歡說진짜로（真的）。'},
+    {k:'Jin（석진）的說話特色',d:'愛說冷笑話，常說분위기（氣氛），자신있게（有自信地），笑聲獨特。'},
+    {k:'SUGA（윤기）的說話特色',d:'話少精煉，常說솔직히（老實說），뭐랄까（怎麼說呢），有時直接說그냥（就這樣）。'},
+    {k:'J-Hope（호석）的說話特色',d:'活潑熱情，常說하이（Hi！），분위기 메이커（氣氛擔當），나야나（是我）。'},
+    {k:'Jimin（지민）的說話特色',d:'溫柔體貼，常說진심으로（真心地），항상（總是），고마워요（謝謝）。'},
+    {k:'V（태형）的說話特色',d:'思路跳躍，常說뭔가（好像/某種程度上），독특하게（獨特地），오늘도 빛나（今天也閃耀）。'},
+    {k:'Jung Kook（정국）的說話特色',d:'率真直接，常說그냥（就是/隨便），진짜（真的），모르겠어（不知道）。'},
+    {k:'공통 인사（共同問候）',d:'안녕하세요 방탄소년단입니다！（你好我們是防彈少年團！）是所有成員的標準開場。'},
+    {k:'멘트 연습（MC練習）',d:'看過去演唱會的MC環節，跟著成員一起唸，是最有趣的聽力練習。'},
+    {k:'팬 미팅 용어',d:'팬사인회（簽名會）、고맙습니다（謝謝您）、사진 찍어도 돼요？（可以拍照嗎？）'},
+  ], tip:'能分辨每個成員的說話風格，是聽力進步到一定程度的標誌，加油！' },
+  { week:18, title:'Anki深度使用與詞彙積累', points:[
+    {k:'Anki間隔重複原理',d:'根據遺忘曲線，在你快要忘記的時候出現複習，是目前最科學的記憶工具。'},
+    {k:'基本牌組下載',d:'搜尋 "Korean Vocabulary" 或 "TOPIK vocabulary" 下載免費牌組，不需要自己建立基礎詞彙。'},
+    {k:'建立BTS專屬牌組',d:'把從影片、歌曲、Weverse聽到的詞加進去，正面韓文、背面中文+例句。'},
+    {k:'加例句的重要性',d:'只記單字很快忘，加上「BTS在哪首歌/哪集說過這個詞」的例句，記憶更牢固。'},
+    {k:'圖片輔助記憶',d:'可以在Anki卡片加入相關圖片（如添加帥照），讓記憶更有趣更持久。'},
+    {k:'每日維持量',d:'建議新卡10–15張，複習卡不限量，每天花10–15分鐘，比一次大量學習更有效。'},
+    {k:'不要一次加太多',d:'一次加超過20個新詞容易堆積複習量，造成壓力，寧可每天少但確實複習。'},
+    {k:'懸掛原則',d:'新詞先不用懂所有用法，掌握核心意思就加進去，隨著接觸增加會自然理解更深。'},
+    {k:'Anki行動版',d:'手機安裝AnkiDroid（Android）或AnkiMobile（iOS），隨時隨地複習。'},
+    {k:'每週檢視進度',d:'查看Anki統計，了解自己的學習量和記憶率，適時調整每日新卡數量。'},
+  ], tip:'Anki要每天開，哪怕只有5分鐘，讓它變成像刷牙一樣的習慣。' },
+  { week:19, title:'語氣詞與口頭禪', points:[
+    {k:'~잖아요（你不知道嗎/明擺著）',d:'帶有「這不是很明顯嗎」的語氣，좋잖아요（這很好啊，明擺著）。'},
+    {k:'~거든요（因為/解釋）',d:'提供原因或解釋，帶有稍微辯解的語氣，바빠거든요 我是因為忙。'},
+    {k:'~네요（哦/真的欸）',d:'表示發現或輕微驚訝，예쁘네요 真漂亮耶，맛있네요 真好吃耶。'},
+    {k:'~죠（對吧/是吧）',d:'確認語氣，맞죠？對吧？아미죠？你是ARMY對吧？'},
+    {k:'~아/어요？（是嗎？）',d:'疑問語調，괜찮아요？你還好嗎？배고파요？餓嗎？'},
+    {k:'~ㄹ/을게요（我會~）',d:'承諾或意志，잘 할게요 我會好好做，올게요 我會來。'},
+    {k:'~ㄴ/은 것 같아요（好像~）',d:'推測語氣，좋은 것 같아요 好像很好，비가 올 것 같아요 好像要下雨。'},
+    {k:'뭐랄까（怎麼說呢）',d:'V太형的口頭禪，思考要怎麼表達時用的填充詞。'},
+    {k:'어떻게 보면（從某個角度看）',d:'帶入分析觀點時使用的連接語。'},
+    {k:'솔직히 말하면（老實說）',d:'윤기的風格，直接說出心裡話時的開頭語。'},
+    {k:'아 있잖아요（啊，有一件事）',d:'開啟話題、有話想說時的開場白。'},
+    {k:'그냥（就是/隨便/就這樣）',d:'정국的口頭禪，有時表示「沒什麼特別理由」，有時是填充詞。'},
+  ], tip:'這些語氣詞讓你理解說話者的態度和感情，是從「聽懂詞彙」到「理解意圖」的關鍵。' },
+  { week:20, title:'TPO場景用語', points:[
+    {k:'在商店/餐廳',d:'이거 주세요（請給我這個）、얼마예요？（多少錢？）、카드 돼요？（能刷卡嗎？）'},
+    {k:'問路',d:'~가 어디에 있어요？（~在哪裡？）、지하철역이 어디예요？（地鐵站在哪裡？）'},
+    {k:'交通',d:'~까지 얼마예요？（到~多少錢？）、어디서 내려요？（在哪裡下車？）'},
+    {k:'打電話',d:'여보세요（喂？）、잠깐만요（請等一下）、메모해 드릴까요？（需要留言嗎？）'},
+    {k:'緊急狀況',d:'도와주세요！（請幫幫我！）、경찰을 불러 주세요（請叫警察）'},
+    {k:'演唱會場內',d:'제 자리가 어디예요？（我的座位在哪裡？）、화장실이 어디예요？（廁所在哪？）'},
+    {k:'遇到韓國歌迷',d:'한국 분이세요？（請問您是韓國人？）、BTS 팬이에요？（你是BTS粉絲？）'},
+    {k:'表達自己的情緒',d:'너무 행복해요（太幸福了）、꿈인 것 같아요（感覺像在做夢）、감동받았어요（被感動了）'},
+    {k:'請對方重複',d:'다시 말해 주세요（請再說一次）、천천히 말해 주세요（請說慢一點）'},
+    {k:'拍照請求',d:'사진 찍어 주세요（請幫我拍照）、같이 사진 찍어요（一起拍照吧）'},
+    {k:'結交朋友',d:'친구 해요（我們做朋友吧）、연락처 알려 주세요（請給我你的聯絡方式）'},
+  ], tip:'演唱會前把「제 자리가 어디예요？」和「화장실이 어디예요？」練熟，現場一定用得到！' },
+  { week:21, title:'情緒表達進階與韓文思維', points:[
+    {k:'복잡한 감정 표현（複雜情感表達）',d:'복잡해요（複雜）、뭔가 이상해요（有點奇怪）、말로 표현할 수 없어요（無法用話語表達）。'},
+    {k:'눈물이 나다（流眼淚）',d:'감동받아서 눈물이 났어요（因為感動所以流眼淚了）。'},
+    {k:'가슴이 뛰다（心跳加速）',d:'콘서트에서 가슴이 뛰었어요（在演唱會心跳加速）。'},
+    {k:'소름 돋다（起雞皮疙瘩）',d:'노래 듣고 소름 돋았어요（聽歌起雞皮疙瘩）。'},
+    {k:'심장이 멈추는 것 같아（心臟好像停止跳動）',d:'帥到不行時的誇張表達，口語中常用。'},
+    {k:'어이가 없다（哭笑不得/傻眼）',d:'어이없어요 我傻眼了，略帶無奈或驚訝。'},
+    {k:'황홀하다（陶醉/迷醉）',d:'무대가 황홀했어요（舞台令人陶醉），演唱會後的感受。'},
+    {k:'추억（回憶/記憶）',d:'좋은 추억이 됐어요（成為美好的回憶），演唱會結束後常說。'},
+    {k:'평생 기억할게요（我會記一輩子）',d:'演唱會結束後想說的話。'},
+    {k:'꿈만 같아요（感覺像夢一樣）',d:'太美好難以置信時的表達。'},
+    {k:'韓文思維：動詞放句尾',d:'中文：我愛BTS。韓文：저는 BTS를 사랑해요。（我/BTS/愛），感受語序的不同。'},
+    {k:'韓文思維：助詞標記語法功能',d:'이/가主格、을/를受格、에서場所、에方向，助詞讓句子結構清晰。'},
+  ], tip:'開始嘗試用韓文「想事情」，哪怕只是「오늘 배고파（今天好餓）」這樣的片段也算！' },
+  { week:22, title:'整體聽力自我測試', points:[
+    {k:'測試方法：Run BTS一集',d:'選一集Run BTS，不開任何字幕，看完後寫下你聽懂了什麼，估計理解率。'},
+    {k:'測試方法：演唱會MC',d:'找一段BTS過去演唱會的MC片段，試著聽懂成員說了什麼重要的話。'},
+    {k:'測試方法：歌詞聽寫',d:'選一首熟悉的BTS歌曲，只用耳朵聽，把歌詞寫下來，再對照正確歌詞。'},
+    {k:'聽力理解階段',d:'初級：聽出單字→中級：理解句子→高級：理解語氣和感情→流利：不需要反應時間。'},
+    {k:'你現在可能在的位置',d:'22週後應該可以達到：聽懂大部分單字，理解部分句子，抓住主題和情緒。'},
+    {k:'填補弱點',d:'回頭看前幾週沒掌握好的內容，集中複習你聽力最弱的環節。'},
+    {k:'Anki詞庫量確認',d:'確認你的Anki牌組已有多少張卡，目標：22週累積500個以上常用詞。'},
+    {k:'口說的重要性',d:'嘗試跟著BTS說話，即使發音不完美也要開口，口說和聽力是相輔相成的。'},
+    {k:'不要因為進步慢而放棄',d:'語言學習的進步不是線性的，會有「停滯期」然後突然「開竅」，繼續堅持。'},
+  ], tip:'誠實評估自己現在的聽力水準，找出弱點，集中用最後兩週強化。' },
+  { week:23, title:'演唱會最終聽力衝刺', points:[
+    {k:'重點複習演唱會用語',d:'把第12週的演唱會場景用語全部再看一遍，確保每句都能聽懂。'},
+    {k:'複習成員名字發音',d:'RM（알엠）、진（Jin）、슈가（SUGA）、제이홉（J-Hope）、지민（Jimin）、뷔（V）、정국（Jung Kook）'},
+    {k:'複習感謝與情感語句',d:'감사합니다、사랑해요、보고 싶었어요、행복해요，這些演唱會一定會出現。'},
+    {k:'練習：看演唱會直播存檔',d:'找一場BTS過去的完整演唱會，不開字幕全程看，記錄每次聽懂的句子。'},
+    {k:'放鬆心態',d:'你不需要聽懂每一個字，能感受到他們說話的情感和大意就是成功。'},
+    {k:'現場氛圍會幫助理解',d:'演唱會現場有視覺、表情、肢體語言輔助，比看影片更容易理解成員的意思。'},
+    {k:'準備小本子',d:'可以帶個小本子記下現場聽到但不確定的詞，回家查詢，繼續學習。'},
+    {k:'最後Anki衝刺',d:'把不確定的卡片全部再複習一遍，確保高頻詞都記住。'},
+  ], tip:'你已經學了23週，比你想像的懂更多！帶著自信去，語言是橋樑，心才是真正的溝通。' },
+  { week:24, title:'演唱會當天與之後', points:[
+    {k:'享受當下',d:'오늘만큼은 즐기자（今天就好好享受），不要因為想聽懂而緊張，讓韓文自然流進耳朵。'},
+    {k:'帶著你學過的詞',d:'每次聽到熟悉的詞就在心裡打勾，感受學習的成果帶來的成就感。'},
+    {k:'演唱會後的韓文學習',d:'演唱會後繼續學，因為你現在有了更強的動機和更多想聽懂的具體內容。'},
+    {k:'加入韓文語言交換',d:'HelloTalk、Tandem找韓國語伴，把學到的用出來。'},
+    {k:'TOPIK考試',d:'韓國語能力測驗，有1–6級，初級考試（1–2級）在24週後的基礎上努力一個月就有機會通過。'},
+    {k:'持續看韓劇/綜藝',d:'用BTS的影片作為持續學習的素材，把興趣轉化為長期學習動力。'},
+    {k:'恭喜完成24週！',d:'你從零基礎到能在演唱會現場理解BTS說話，這是真實的成就，繼續走下去 💜'},
+  ], tip:'演唱會是一個里程碑，不是終點。語言學習的快樂在於每一天都比昨天懂得更多 💜' },
+];
+
+function renderWeeklyCurriculum(data, containerId, accentColor, dimColor){
+  var container = document.getElementById(containerId);
+  if(!container){ return; }
+  container.innerHTML = '';
+  for(var wi=0; wi<data.length; wi++){
+    var w = data[wi];
+    var div = document.createElement('div');
+    div.style.cssText = 'margin-bottom:8px;border-radius:10px;overflow:hidden;border:1px solid var(--border);';
+
+    var header = document.createElement('div');
+    header.style.cssText = 'display:flex;align-items:center;gap:10px;padding:13px 16px;cursor:pointer;background:var(--bg3);';
+    var wnum = document.createElement('span');
+    wnum.style.cssText = 'font-family:Space Mono,monospace;font-size:11px;min-width:42px;color:var(--text3);';
+    wnum.textContent = 'W' + String(w.week).padStart(2,'0');
+    var wtitle = document.createElement('span');
+    wtitle.style.cssText = 'flex:1;font-size:13px;font-weight:500;color:var(--text2);';
+    wtitle.textContent = w.title;
+    var arrow = document.createElement('span');
+    arrow.style.cssText = 'font-size:11px;color:var(--text3);transition:transform 0.2s;';
+    arrow.textContent = '▼';
+    header.appendChild(wnum);
+    header.appendChild(wtitle);
+    header.appendChild(arrow);
+
+    var body = document.createElement('div');
+    body.style.cssText = 'display:none;padding:14px 16px;background:var(--bg2);border-top:1px solid var(--border);';
+
+    var kw = document.createElement('div');
+    kw.style.cssText = 'display:flex;flex-direction:column;gap:8px;margin-bottom:12px;';
+    for(var pi=0; pi<w.points.length; pi++){
+      var p = w.points[pi];
+      var row = document.createElement('div');
+      row.style.cssText = 'background:var(--bg3);border-radius:8px;padding:10px 12px;';
+      var kspan = document.createElement('div');
+      kspan.style.cssText = 'font-size:12px;font-weight:700;color:'+accentColor+';margin-bottom:4px;';
+      kspan.textContent = p.k;
+      var dspan = document.createElement('div');
+      dspan.style.cssText = 'font-size:12px;color:var(--text2);line-height:1.6;';
+      dspan.textContent = p.d;
+      row.appendChild(kspan);
+      if(p.d) row.appendChild(dspan);
+      kw.appendChild(row);
+    }
+    body.appendChild(kw);
+
+    if(w.tip){
+      var tip = document.createElement('div');
+      tip.style.cssText = 'background:rgba(251,191,36,0.07);border-left:3px solid var(--amber);padding:9px 12px;border-radius:0 6px 6px 0;font-size:12px;color:var(--text2);line-height:1.6;';
+      tip.textContent = '💡 ' + w.tip;
+      body.appendChild(tip);
+    }
+
+    (function(h, b, a){
+      h.addEventListener('click', function(){
+        var isOpen = b.style.display === 'block';
+        b.style.display = isOpen ? 'none' : 'block';
+        a.style.transform = isOpen ? '' : 'rotate(180deg)';
+      });
+    })(header, body, arrow);
+
+    div.appendChild(header);
+    div.appendChild(body);
+    container.appendChild(div);
+  }
+}
+
+// NAV
+function showPage(name){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n=>{
+    if(n.getAttribute('onclick')?.includes("'"+name+"'")) n.classList.add('active');
+  });
+  if(name==='review'){ renderHeatmap(); renderCalendar(); renderStats(); }
+  if(name==='todo'){ renderTodos(); }
+  if(name==='inspire'){ renderInspires(); }
+  if(window.innerWidth<=700) document.getElementById('sidebar').classList.remove('open');
+}
+
+function switchLearn(tab){
+  document.querySelectorAll('.learn-tab').forEach((t,i)=>{
+    t.classList.toggle('active',['invest','korean'][i]===tab);
+  });
+  document.querySelectorAll('.learn-content').forEach(c=>c.classList.remove('active'));
+  document.getElementById('learn-'+tab).classList.add('active');
+}
+
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2000);
+}
+function toggleSidebar(){ document.getElementById('sidebar').classList.toggle('open'); }
+function toggleAcc(h){ h.parentElement.classList.toggle('open'); }
+
+function updateDateDisplay(){
+  const d = new Date();
+  const days = ['日','一','二','三','四','五','六'];
+  const dateEl = document.getElementById('today-date');
+  const dayEl = document.getElementById('today-day');
+  if(dateEl) dateEl.textContent = (d.getMonth()+1)+'月'+d.getDate()+'日';
+  if(dayEl){
+    // Day 1 = first time user opened the app (stored in localStorage)
+    const planStart = new Date(START_DATE);
+    const diffMs = d - planStart;
+    const dayNum = Math.max(1, Math.floor(diffMs / 86400000) + 1);
+    dayEl.textContent = '星期'+days[d.getDay()]+'　第 '+dayNum+' 天';
+  }
+}
+function updateCountdown(){
+  const concertDay = new Date('2026-11-19T00:00:00');
+  const now = new Date();
+  const diff = Math.ceil((concertDay - now) / 86400000);
+  const numEl = document.getElementById('countdown-num');
+  const barEl = document.getElementById('countdown-bar');
+  const dateEl = document.getElementById('countdown-date');
+  if(numEl) numEl.textContent = diff > 0 ? diff : diff === 0 ? '0' : '已結束';
+  if(dateEl){
+    const d = now;
+    dateEl.textContent = d.getFullYear()+'/'+(d.getMonth()+1)+'/'+d.getDate();
+  }
+  if(barEl){
+    // progress from today to concert (based on 166 days total)
+    const totalDays = 166;
+    const elapsed = Math.max(0, totalDays - diff);
+    const pct = Math.min(100, Math.round(elapsed / totalDays * 100));
+    barEl.style.width = pct + '%';
+  }
+}
+
+
+// EDITABLE MOTTO
+function loadMottos(){
+  var keys = ['motto_today','motto_invest','motto_korean'];
+  var ids  = ['motto-today','motto-invest','motto-korean'];
+  for(var i=0;i<keys.length;i++){
+    var saved = localStorage.getItem(keys[i]);
+    if(saved){
+      var el = document.getElementById(ids[i]);
+      if(el) el.textContent = saved;
+    }
+  }
+}
+
+function startEdit(elId, storageKey){
+  var el = document.getElementById(elId);
+  if(!el || el.querySelector('textarea')) return;
+  var current = el.textContent;
+  var original_style = el.getAttribute('style');
+  el.innerHTML = '';
+  var ta = document.createElement('textarea');
+  ta.value = current;
+  ta.style.cssText = 'width:100%;background:transparent;border:none;outline:none;resize:none;font-size:13px;line-height:1.8;color:inherit;font-family:inherit;padding:0;min-height:60px;';
+  ta.rows = Math.max(3, current.split('\n').length + 1);
+  el.appendChild(ta);
+  el.style.cursor = 'default';
+  ta.focus();
+  ta.select();
+  ta.addEventListener('blur', function(){
+    var val = ta.value.trim() || current;
+    localStorage.setItem(storageKey, val);
+    el.textContent = val;
+    el.style.cursor = 'pointer';
+    el.setAttribute('style', original_style);
+  });
+  ta.addEventListener('keydown', function(e){
+    if(e.key === 'Escape'){
+      el.textContent = current;
+      el.style.cursor = 'pointer';
+    }
+  });
+  // stop click propagation so onclick doesn't re-trigger
+  ta.addEventListener('click', function(e){ e.stopPropagation(); });
+}
+
+
+// ── TODO ──────────────────────────────────────────
+function getTodos(){ try{return JSON.parse(localStorage.getItem('todos')||'[]')}catch(e){return[]} }
+function saveTodos(d){ localStorage.setItem('todos',JSON.stringify(d)); }
+
+function addTodo(){
+  var inp = document.getElementById('todo-input');
+  var text = inp.value.trim();
+  if(!text) return;
+  var todos = getTodos();
+  todos.unshift({id: Date.now(), text: text, done: false});
+  saveTodos(todos);
+  inp.value = '';
+  renderTodos();
+}
+
+function toggleTodo(id){
+  var todos = getTodos();
+  for(var i=0;i<todos.length;i++){
+    if(todos[i].id === id){ todos[i].done = !todos[i].done; break; }
+  }
+  saveTodos(todos);
+  renderTodos();
+}
+
+function deleteTodo(id){
+  var todos = getTodos().filter(function(t){ return t.id !== id; });
+  saveTodos(todos);
+  renderTodos();
+}
+
+function renderTodos(){
+  var todos = getTodos();
+  var active = todos.filter(function(t){ return !t.done; });
+  var done = todos.filter(function(t){ return t.done; });
+  var list = document.getElementById('todo-list');
+  var doneList = document.getElementById('todo-done-list');
+  var doneSection = document.getElementById('todo-done-section');
+  var doneCount = document.getElementById('todo-done-count');
+  if(!list) return;
+  list.innerHTML = '';
+  active.forEach(function(t){
+    var row = makeTodoRow(t, false, 'toggleTodo', 'deleteTodo');
+    list.appendChild(row);
+  });
+  if(active.length === 0){
+    var empty = document.createElement('div');
+    empty.style.cssText = 'font-size:13px;color:var(--text3);padding:8px 0;';
+    empty.textContent = '今天的待辦事項都完成了！';
+    list.appendChild(empty);
+  }
+  if(doneList) doneList.innerHTML = '';
+  done.forEach(function(t){
+    var row = makeTodoRow(t, true, 'toggleTodo', 'deleteTodo');
+    if(doneList) doneList.appendChild(row);
+  });
+  if(doneSection) doneSection.style.display = done.length > 0 ? 'block' : 'none';
+  if(doneCount) doneCount.textContent = '(' + done.length + ')';
+}
+
+function makeTodoRow(t, isDone, toggleFn, deleteFn){
+  var row = document.createElement('div');
+  row.style.cssText = 'display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--bg3);border-radius:8px;border:1px solid var(--border);';
+  var box = document.createElement('div');
+  box.style.cssText = 'width:20px;height:20px;border-radius:5px;border:2px solid '+(isDone?'var(--purple)':'var(--text3)')+';flex-shrink:0;display:flex;align-items:center;justify-content:center;cursor:pointer;background:'+(isDone?'var(--purple)':'transparent')+';';
+  box.innerHTML = isDone ? '<span style="color:#fff;font-size:12px;">✓</span>' : '';
+  box.onclick = (function(id){ return function(){ window[toggleFn](id); }; })(t.id);
+  var label = document.createElement('span');
+  label.style.cssText = 'flex:1;font-size:13px;color:'+(isDone?'var(--text3)':'var(--text)')+';'+(isDone?'text-decoration:line-through;':'');
+  label.textContent = t.text;
+  var del = document.createElement('span');
+  del.style.cssText = 'font-size:16px;color:var(--text3);cursor:pointer;padding:0 4px;line-height:1;';
+  del.textContent = '×';
+  del.onclick = (function(id){ return function(){ window[deleteFn](id); }; })(t.id);
+  row.appendChild(box);
+  row.appendChild(label);
+  row.appendChild(del);
+  return row;
+}
+
+var todoDoneVisible = false;
+function toggleDoneList(){
+  todoDoneVisible = !todoDoneVisible;
+  var el = document.getElementById('todo-done-list');
+  var arrow = document.getElementById('done-arrow');
+  if(el) el.style.display = todoDoneVisible ? 'flex' : 'none';
+  if(arrow) arrow.style.transform = todoDoneVisible ? 'rotate(180deg)' : '';
+}
+
+// ── INSPIRE ────────────────────────────────────────
+function getInspires(){ try{return JSON.parse(localStorage.getItem('inspires')||'[]')}catch(e){return[]} }
+function saveInspires(d){ localStorage.setItem('inspires',JSON.stringify(d)); }
+
+function addInspire(){
+  var inp = document.getElementById('inspire-input');
+  var text = inp.value.trim();
+  if(!text) return;
+  var items = getInspires();
+  items.unshift({id: Date.now(), text: text, done: false});
+  saveInspires(items);
+  inp.value = '';
+  renderInspires();
+}
+
+function toggleInspire(id){
+  var items = getInspires();
+  for(var i=0;i<items.length;i++){
+    if(items[i].id === id){ items[i].done = !items[i].done; break; }
+  }
+  saveInspires(items);
+  renderInspires();
+}
+
+function deleteInspire(id){
+  var items = getInspires().filter(function(t){ return t.id !== id; });
+  saveInspires(items);
+  renderInspires();
+}
+
+function renderInspires(){
+  var items = getInspires();
+  var active = items.filter(function(t){ return !t.done; });
+  var done = items.filter(function(t){ return t.done; });
+  var list = document.getElementById('inspire-list');
+  var doneList = document.getElementById('inspire-done-list');
+  var doneSection = document.getElementById('inspire-done-section');
+  var doneCount = document.getElementById('inspire-done-count');
+  if(!list) return;
+  list.innerHTML = '';
+  active.forEach(function(t){
+    var row = makeTodoRow(t, false, 'toggleInspire', 'deleteInspire');
+    list.appendChild(row);
+  });
+  if(active.length === 0){
+    var empty = document.createElement('div');
+    empty.style.cssText = 'font-size:13px;color:var(--text3);padding:8px 0;';
+    empty.textContent = '還沒有靈感，隨時記下你的想法！';
+    list.appendChild(empty);
+  }
+  if(doneList) doneList.innerHTML = '';
+  done.forEach(function(t){
+    var row = makeTodoRow(t, true, 'toggleInspire', 'deleteInspire');
+    if(doneList) doneList.appendChild(row);
+  });
+  if(doneSection) doneSection.style.display = done.length > 0 ? 'block' : 'none';
+  if(doneCount) doneCount.textContent = '(' + done.length + ')';
+}
+
+var inspireDoneVisible = false;
+function toggleInspireDone(){
+  inspireDoneVisible = !inspireDoneVisible;
+  var el = document.getElementById('inspire-done-list');
+  var arrow = document.getElementById('inspire-done-arrow');
+  if(el) el.style.display = inspireDoneVisible ? 'flex' : 'none';
+  if(arrow) arrow.style.transform = inspireDoneVisible ? 'rotate(180deg)' : '';
+}
+
+
+// ── DRAG TO REORDER CHECKLIST ─────────────────────
+var dragSrcEl = null;
+
+function dragStart(e){
+  dragSrcEl = e.currentTarget;
+  dragSrcEl.classList.add('dragging');
+  e.dataTransfer.effectAllowed = 'move';
+  e.dataTransfer.setData('text/plain', dragSrcEl.dataset.key);
+}
+
+function dragOver(e){
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'move';
+  var target = e.currentTarget;
+  if(target !== dragSrcEl && target.classList.contains('check-item')){
+    document.querySelectorAll('.check-item').forEach(function(el){ el.classList.remove('drag-over'); });
+    target.classList.add('drag-over');
+  }
+}
+
+function dropItem(e){
+  e.preventDefault();
+  var target = e.currentTarget;
+  if(target === dragSrcEl || !target.classList.contains('check-item')) return;
+  var list = document.getElementById('checklist');
+  var items = Array.from(list.children);
+  var srcIdx = items.indexOf(dragSrcEl);
+  var tgtIdx = items.indexOf(target);
+  if(srcIdx < tgtIdx){
+    list.insertBefore(dragSrcEl, target.nextSibling);
+  } else {
+    list.insertBefore(dragSrcEl, target);
+  }
+  // Save order
+  var order = Array.from(list.children).map(function(el){ return el.dataset.key; });
+  localStorage.setItem('checklist_order', JSON.stringify(order));
+  document.querySelectorAll('.check-item').forEach(function(el){ el.classList.remove('drag-over'); });
+}
+
+function dragEnd(e){
+  if(dragSrcEl) dragSrcEl.classList.remove('dragging');
+  document.querySelectorAll('.check-item').forEach(function(el){ el.classList.remove('drag-over'); });
+  dragSrcEl = null;
+}
+
+function applyChecklistOrder(){
+  var saved = localStorage.getItem('checklist_order');
+  if(!saved) return;
+  try{
+    var order = JSON.parse(saved);
+    var list = document.getElementById('checklist');
+    if(!list) return;
+    order.forEach(function(key){
+      var el = list.querySelector('[data-key="'+key+'"]');
+      if(el) list.appendChild(el);
+    });
+  }catch(e){}
+}
+
+// INIT
+updateDateDisplay();
+updateCountdown();
+loadToday();
+loadMottos();
+applyChecklistOrder();
+renderWeeklyCurriculum(INVEST_WEEKS,'invest-weeks','#fbbf24','rgba(251,191,36,0.08)');
+renderWeeklyCurriculum(KOREAN_WEEKS,'korean-weeks','#9b87f5','rgba(155,135,245,0.08)');
+renderTodos();
+renderInspires();
+setInterval(updateCountdown,60000);
+</script>
+</body>
+</html>
