@@ -66,6 +66,7 @@ body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--text
 .tag-fans{background:rgba(52,211,153,0.12);color:var(--teal);}
 .tag-water{background:rgba(56,189,248,0.12);color:#38bdf8;}
 .tag-sleep{background:rgba(167,139,250,0.12);color:#a78bfa;}
+.tag-reading{background:rgba(251,146,60,0.12);color:#fb923c;}
 .summary-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px;}
 .summary-card{background:var(--bg3);border-radius:var(--radius-sm);padding:14px;border:1px solid var(--border);text-align:center;}
 .summary-num{font-family:'Space Mono',monospace;font-size:22px;font-weight:700;color:var(--purple);}
@@ -103,7 +104,8 @@ body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--text
 .modal{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius);padding:24px;width:360px;max-width:90vw;transform:translateY(8px);transition:transform 0.2s;}
 .modal-overlay.open .modal{transform:translateY(0);}
 .modal-date{font-family:'Space Mono',monospace;font-size:16px;font-weight:700;color:var(--purple);margin-bottom:16px;}
-.modal-item{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);}
+.modal-item{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);transition:background 0.15s;border-radius:6px;}
+.modal-item:hover{background:var(--bg3);padding-left:8px;padding-right:8px;}
 .modal-item:last-child{border-bottom:none;}
 .modal-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
 .modal-dot.done{background:var(--purple);}
@@ -181,6 +183,7 @@ body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--text
   .stats-grid{grid-template-columns:1fr;}
 }
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 </head>
 <body>
 <div class="menu-toggle" onclick="toggleSidebar()">☰</div>
@@ -204,6 +207,10 @@ body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--text
     <div class="nav-label">筆記</div>
     <div class="nav-item" onclick="showPage('todo')"><span class="nav-icon">✦</span> 當日待辦</div>
     <div class="nav-item" onclick="showPage('inspire')"><span class="nav-icon">✦</span> 靈感收集箱</div>
+  </div>
+  <div class="nav-section">
+    <div class="nav-label">統計</div>
+    <div class="nav-item" onclick="showPage('stats')"><span class="nav-icon">◈</span> 數據統計</div>
   </div>
   <div class="sidebar-bottom">
     <div class="concert-countdown">
@@ -234,7 +241,7 @@ body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--text
   </div>
   <div class="summary-row">
     <div class="summary-card"><div class="summary-num" id="done-count">0</div><div class="summary-label">今日完成</div></div>
-    <div class="summary-card"><div class="summary-num">8</div><div class="summary-label">總項目</div></div>
+    <div class="summary-card"><div class="summary-num" id="total-habit-count">9</div><div class="summary-label">總項目</div></div>
     <div class="summary-card"><div class="summary-num" id="streak-count">0</div><div class="summary-label">連續天數</div></div>
     <div class="summary-card"><div class="summary-num" id="total-days">0</div><div class="summary-label">累計天數</div></div>
   </div>
@@ -281,6 +288,11 @@ body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--text
         <span class="check-label">準時就寢（按當前階段目標）</span>
         <span class="check-tag tag-sleep">作息</span>
       </div>
+      <div class="check-item" draggable="true" ondragstart="dragStart(event)" ondragover="dragOver(event)" ondrop="dropItem(event)" ondragend="dragEnd(event)" onclick="toggle(this)" data-key="reading"><span class="drag-handle" onclick="event.stopPropagation()">⠿</span>
+        <div class="check-box"><span class="check-tick">✓</span></div>
+        <span class="check-label">每日閱讀五分鐘</span>
+        <span class="check-tag tag-reading">閱讀</span>
+      </div>
     </div>
   </div>
 </div>
@@ -319,6 +331,7 @@ body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--text
   <!-- 月曆 -->
   <div class="card">
     <div class="card-title">月曆</div>
+    <div style="font-size:11px;color:var(--text3);margin-bottom:14px;line-height:1.6;">💡 點擊任何過去或今天的日期，可以補打卡或修改紀錄</div>
     <div class="cal-nav">
       <button class="cal-nav-btn" onclick="changeMonth(-1)">‹ 上個月</button>
       <div class="cal-month-label" id="cal-month-label">—</div>
@@ -443,6 +456,59 @@ body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--text
   </div>
 </div>
 
+<!-- STATS PAGE -->
+<div class="page" id="page-stats">
+  <div class="page-header">
+    <div class="page-title">數據統計</div>
+    <div class="page-sub">你的打卡習慣完整分析</div>
+  </div>
+
+  <!-- 總覽 -->
+  <div class="summary-row" id="stats-overview-row" style="margin-bottom:16px;">
+    <div class="summary-card"><div class="summary-num" id="st-total-days">0</div><div class="summary-label">累計打卡天數</div></div>
+    <div class="summary-card"><div class="summary-num" id="st-streak">0</div><div class="summary-label">最長連續天數</div></div>
+    <div class="summary-card"><div class="summary-num" id="st-avg-rate">0%</div><div class="summary-label">平均完成率</div></div>
+    <div class="summary-card"><div class="summary-num" id="st-best-habit">—</div><div class="summary-label">最強習慣</div></div>
+  </div>
+
+  <!-- 雷達圖：各習慣完成率 -->
+  <div class="card">
+    <div class="card-title">各習慣完成率（雷達圖）</div>
+    <div style="position:relative;height:280px;max-width:380px;margin:0 auto;">
+      <canvas id="radar-chart"></canvas>
+    </div>
+  </div>
+
+  <!-- 長條圖：各習慣完成天數 -->
+  <div class="card">
+    <div class="card-title">各習慣完成天數（長條圖）</div>
+    <div style="position:relative;height:220px;">
+      <canvas id="bar-chart"></canvas>
+    </div>
+  </div>
+
+  <!-- 折線圖：每週完成趨勢 -->
+  <div class="card">
+    <div class="card-title">每週完成趨勢（折線圖）</div>
+    <div style="position:relative;height:200px;">
+      <canvas id="line-chart"></canvas>
+    </div>
+    <div style="font-size:11px;color:var(--text3);margin-top:8px;">每週平均每天完成幾項任務</div>
+  </div>
+
+  <!-- 最佳/最差習慣 -->
+  <div class="card">
+    <div class="card-title">習慣排行</div>
+    <div id="habit-ranking" style="display:flex;flex-direction:column;gap:8px;"></div>
+  </div>
+
+  <!-- 空狀態 -->
+  <div id="stats-empty" style="display:none;text-align:center;padding:40px 20px;color:var(--text3);font-size:13px;">
+    還沒有打卡資料！<br>先去今日打卡完成幾天，這裡就會顯示你的統計數據 💜
+  </div>
+</div>
+
+
 </main>
 </div>
 
@@ -458,9 +524,9 @@ body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--text
 <div class="toast" id="toast"></div>
 
 <script>
-const HABITS = ['korean','invest','exercise','dance','fans','water','sleep','bedtime'];
-const HABIT_LABELS = {korean:'韓文學習',invest:'投資理財',exercise:'運動訓練',dance:'舞蹈練習',fans:'應援物',water:'喝水2000ml',sleep:'睡眠達標',bedtime:'準時就寢'};
-const HABIT_COLORS = {korean:'#9b87f5',invest:'#fbbf24',exercise:'#4ade80',dance:'#f87171',fans:'#34d399',water:'#38bdf8',sleep:'#a78bfa',bedtime:'#c084fc'};
+const HABITS = ['korean','invest','exercise','dance','fans','water','sleep','bedtime','reading'];
+const HABIT_LABELS = {korean:'韓文學習',invest:'投資理財',exercise:'運動訓練',dance:'舞蹈練習',fans:'應援物',water:'喝水2000ml',sleep:'睡眠達標',bedtime:'準時就寢',reading:'每日閱讀'};
+const HABIT_COLORS = {korean:'#9b87f5',invest:'#fbbf24',exercise:'#4ade80',dance:'#f87171',fans:'#34d399',water:'#38bdf8',sleep:'#a78bfa',bedtime:'#c084fc',reading:'#fb923c'};
 // CONCERT defined above
 // START_DATE used instead
 // DAYS computed dynamically
@@ -501,6 +567,7 @@ function updateSummary(){
   const data=getStorage(), k=todayKey(), today=data[k]||{};
   const done=HABITS.filter(h=>today[h]).length;
   document.getElementById('done-count').textContent=done;
+  document.getElementById('total-habit-count').textContent=HABITS.length;
   const streak=calcStreak(data);
   document.getElementById('streak-count').textContent=streak;
   document.getElementById('streak-big').textContent=streak;
@@ -538,7 +605,7 @@ function renderHeatmap(){
     if(k===todayStr) cls+=' today';
     const cell=document.createElement('div');
     cell.className=cls;
-    cell.title=`${d.getMonth()+1}/${d.getDate()} 完成${done}/8`;
+    cell.title=`${d.getMonth()+1}/${d.getDate()} 完成${done}/${HABITS.length}`;
     cell.onclick=()=>openModal(k);
     grid.appendChild(cell);
   }
@@ -566,7 +633,7 @@ function renderCalendar(){
     const k=`${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
     const day=data[k]||{}, done=HABITS.filter(h=>day[h]).length;
     const el=document.createElement('div');
-    el.className='cal-day'+(done>0?' has-data':'')+(done===8?' full-day':'')+(k===todayStr?' today-cal':'');
+    el.className='cal-day'+(done>0?' has-data':'')+(done===HABITS.length?' full-day':'')+(k===todayStr?' today-cal':'');
     const num=document.createElement('div'); num.className='cal-num'; num.textContent=d;
     el.appendChild(num);
     if(done>0){
@@ -577,6 +644,10 @@ function renderCalendar(){
         dots.appendChild(dot);
       });
       el.appendChild(dots);
+    }
+    // 過去與今天的日期都可以點擊補打卡，未來日期不可點擊
+    if(k<=todayStr){
+      el.style.cursor='pointer';
       el.onclick=()=>openModal(k);
     }
     grid.appendChild(el);
@@ -609,21 +680,46 @@ function renderStats(){
 }
 
 // MODAL
+var currentModalKey = null;
+
 function openModal(k){
+  currentModalKey = k;
   const data=getStorage(), day=data[k]||{};
   const parts=k.split('-');
   document.getElementById('modal-date').textContent=`${parts[0]}年${parseInt(parts[1])}月${parseInt(parts[2])}日`;
+  renderModalItems();
+  document.getElementById('modal-overlay').classList.add('open');
+}
+
+function renderModalItems(){
+  const data=getStorage(), day=data[currentModalKey]||{};
   const body=document.getElementById('modal-body');
   body.innerHTML='';
   HABITS.forEach(h=>{
     const done=!!day[h];
     const item=document.createElement('div');
     item.className='modal-item'+(done?' done-item':'');
-    item.innerHTML=`<div class="modal-dot ${done?'done':'undone'}"></div><div class="modal-item-label">${HABIT_LABELS[h]}</div><div style="margin-left:auto;font-size:12px;color:${done?'var(--purple)':'var(--text3)'}">${done?'✓ 完成':'—'}</div>`;
+    item.style.cursor='pointer';
+    item.innerHTML=`<div class="modal-dot ${done?'done':'undone'}"></div><div class="modal-item-label">${HABIT_LABELS[h]}</div><div style="margin-left:auto;font-size:12px;color:${done?'var(--purple)':'var(--text3)'}">${done?'✓ 完成':'點擊補打卡'}</div>`;
+    item.onclick=function(){ toggleModalHabit(h); };
     body.appendChild(item);
   });
-  document.getElementById('modal-overlay').classList.add('open');
 }
+
+function toggleModalHabit(h){
+  const data=getStorage();
+  if(!data[currentModalKey]) data[currentModalKey]={};
+  data[currentModalKey][h] = !data[currentModalKey][h];
+  setStorage(data);
+  renderModalItems();
+  // 即時更新所有相關畫面
+  renderCalendar();
+  renderHeatmap();
+  renderStats();
+  if(currentModalKey===todayKey()) loadToday();
+  showToast(data[currentModalKey][h] ? '✓ 已補打卡' : '已取消打卡');
+}
+
 function closeModal(e){
   if(!e||e.target===document.getElementById('modal-overlay'))
     document.getElementById('modal-overlay').classList.remove('open');
@@ -1326,6 +1422,7 @@ function showPage(name){
   if(name==='review'){ renderHeatmap(); renderCalendar(); renderStats(); }
   if(name==='todo'){ renderTodos(); }
   if(name==='inspire'){ renderInspires(); }
+  if(name==='stats'){ renderStats(); }
   if(window.innerWidth<=700) document.getElementById('sidebar').classList.remove('open');
 }
 
@@ -1640,6 +1737,189 @@ function applyChecklistOrder(){
       if(el) list.appendChild(el);
     });
   }catch(e){}
+}
+
+
+// ── STATS PAGE ────────────────────────────────────
+var statsCharts = {};
+function destroyStatsChart(id){ if(statsCharts[id]){ statsCharts[id].destroy(); delete statsCharts[id]; } }
+
+var HABIT_SHORT = {
+  korean:'韓文',invest:'投資',exercise:'運動',
+  dance:'舞蹈',fans:'應援物',water:'喝水',
+  sleep:'睡眠',bedtime:'作息',reading:'閱讀'
+};
+
+function renderStats(){
+  var data = getStorage();
+  var days = Object.keys(data).filter(function(k){ return Object.values(data[k]).some(function(v){return v;}); });
+
+  if(days.length === 0){
+    document.getElementById('stats-empty').style.display = 'block';
+    ['stats-overview-row','radar-chart','bar-chart','line-chart','habit-ranking'].forEach(function(id){
+      var el = document.getElementById(id);
+      if(el) el.style.display = 'none';
+    });
+    return;
+  }
+  document.getElementById('stats-empty').style.display = 'none';
+
+  // ── 總覽數字 ──
+  var totalDays = days.length;
+  // 計算最長連續天數
+  var sortedDays = days.slice().sort();
+  var maxStreak = 0, curStreak = 1;
+  for(var i=1;i<sortedDays.length;i++){
+    var prev = new Date(sortedDays[i-1]);
+    var cur = new Date(sortedDays[i]);
+    var diff = (cur - prev) / 86400000;
+    if(diff === 1){ curStreak++; maxStreak = Math.max(maxStreak, curStreak); }
+    else { curStreak = 1; }
+  }
+  maxStreak = Math.max(maxStreak, curStreak);
+
+  // 各習慣完成次數
+  var habitCounts = {};
+  HABITS.forEach(function(h){ habitCounts[h] = 0; });
+  days.forEach(function(dk){
+    HABITS.forEach(function(h){ if(data[dk][h]) habitCounts[h]++; });
+  });
+
+  // 平均完成率
+  var totalCompleted = HABITS.reduce(function(s,h){ return s+habitCounts[h]; }, 0);
+  var avgRate = Math.round(totalCompleted / (totalDays * HABITS.length) * 100);
+
+  // 最強習慣
+  var bestHabit = HABITS.reduce(function(a,b){ return habitCounts[a]>=habitCounts[b]?a:b; });
+
+  document.getElementById('st-total-days').textContent = totalDays;
+  document.getElementById('st-streak').textContent = maxStreak;
+  document.getElementById('st-avg-rate').textContent = avgRate+'%';
+  document.getElementById('st-best-habit').textContent = HABIT_SHORT[bestHabit];
+
+  // ── 雷達圖 ──
+  var radarRates = HABITS.map(function(h){ return totalDays>0?Math.round(habitCounts[h]/totalDays*100):0; });
+  destroyStatsChart('radar');
+  var rCtx = document.getElementById('radar-chart').getContext('2d');
+  statsCharts['radar'] = new Chart(rCtx, {
+    type: 'radar',
+    data: {
+      labels: HABITS.map(function(h){ return HABIT_SHORT[h]; }),
+      datasets:[{
+        label:'完成率%',
+        data: radarRates,
+        backgroundColor:'rgba(155,135,245,0.15)',
+        borderColor:'#9b87f5',
+        borderWidth:2,
+        pointBackgroundColor:'#9b87f5',
+        pointRadius:4
+      }]
+    },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      scales:{r:{
+        min:0,max:100,
+        grid:{color:'rgba(255,255,255,0.06)'},
+        angleLines:{color:'rgba(255,255,255,0.06)'},
+        ticks:{color:'#5a5670',font:{size:10},stepSize:25,backdropColor:'transparent'},
+        pointLabels:{color:'#9994b0',font:{size:11}}
+      }},
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:function(c){ return c.raw+'%'; }}}}
+    }
+  });
+
+  // ── 長條圖 ──
+  var barColors = HABITS.map(function(h){ return Object.values(HABIT_COLORS)[HABITS.indexOf(h)]; });
+  destroyStatsChart('bar');
+  var bCtx = document.getElementById('bar-chart').getContext('2d');
+  statsCharts['bar'] = new Chart(bCtx, {
+    type:'bar',
+    data:{
+      labels: HABITS.map(function(h){ return HABIT_SHORT[h]; }),
+      datasets:[{
+        label:'完成天數',
+        data: HABITS.map(function(h){ return habitCounts[h]; }),
+        backgroundColor: HABITS.map(function(h){ return HABIT_COLORS[h]+'99'; }),
+        borderColor: HABITS.map(function(h){ return HABIT_COLORS[h]; }),
+        borderWidth:1,
+        borderRadius:4
+      }]
+    },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      scales:{
+        x:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#5a5670',font:{size:11}}},
+        y:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#5a5670',font:{size:11}},beginAtZero:true}
+      },
+      plugins:{legend:{display:false}}
+    }
+  });
+
+  // ── 折線圖：每週趨勢 ──
+  // 把資料按週分組
+  var weekMap = {};
+  days.forEach(function(dk){
+    var d = new Date(dk);
+    // 以週一為週起點
+    var day = d.getDay();
+    var monday = new Date(d);
+    monday.setDate(d.getDate() - (day===0?6:day-1));
+    var wk = monday.getFullYear()+'-'+String(monday.getMonth()+1).padStart(2,'0')+'-'+String(monday.getDate()).padStart(2,'0');
+    if(!weekMap[wk]) weekMap[wk] = {total:0,days:0};
+    var done = HABITS.filter(function(h){ return data[dk][h]; }).length;
+    weekMap[wk].total += done;
+    weekMap[wk].days += 1;
+  });
+  var weekKeys = Object.keys(weekMap).sort().slice(-12); // 最近12週
+  var weekLabels = weekKeys.map(function(k){ var p=k.split('-'); return p[1]+'/'+p[2]; });
+  var weekAvgs = weekKeys.map(function(k){ return parseFloat((weekMap[k].total/weekMap[k].days).toFixed(1)); });
+
+  destroyStatsChart('line');
+  var lCtx = document.getElementById('line-chart').getContext('2d');
+  statsCharts['line'] = new Chart(lCtx, {
+    type:'line',
+    data:{
+      labels: weekLabels,
+      datasets:[{
+        label:'每日平均完成項目',
+        data: weekAvgs,
+        borderColor:'#9b87f5',
+        backgroundColor:'rgba(155,135,245,0.08)',
+        fill:true,
+        tension:0.4,
+        pointRadius:4,
+        pointBackgroundColor:'#9b87f5',
+        borderWidth:2
+      }]
+    },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      scales:{
+        x:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#5a5670',font:{size:11}}},
+        y:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#5a5670',font:{size:11}},min:0,max:8,stepSize:2}
+      },
+      plugins:{legend:{display:false}}
+    }
+  });
+
+  // ── 習慣排行 ──
+  var ranking = document.getElementById('habit-ranking');
+  ranking.innerHTML = '';
+  var sorted = HABITS.slice().sort(function(a,b){ return habitCounts[b]-habitCounts[a]; });
+  sorted.forEach(function(h, i){
+    var rate = totalDays>0?Math.round(habitCounts[h]/totalDays*100):0;
+    var row = document.createElement('div');
+    row.style.cssText = 'display:flex;align-items:center;gap:12px;padding:10px 14px;background:var(--bg3);border-radius:8px;border:1px solid var(--border);';
+    row.innerHTML =
+      '<span style="font-family:Space Mono,monospace;font-size:11px;color:var(--text3);min-width:20px;">#'+(i+1)+'</span>'+
+      '<div style="width:8px;height:8px;border-radius:50%;background:'+HABIT_COLORS[h]+';flex-shrink:0;"></div>'+
+      '<span style="flex:1;font-size:13px;color:var(--text);">'+HABIT_SHORT[h]+'</span>'+
+      '<div style="flex:2;height:4px;background:var(--bg4);border-radius:2px;overflow:hidden;">'+
+        '<div style="height:100%;width:'+rate+'%;background:'+HABIT_COLORS[h]+';border-radius:2px;"></div>'+
+      '</div>'+
+      '<span style="font-family:Space Mono,monospace;font-size:12px;color:var(--text2);min-width:60px;text-align:right;">'+habitCounts[h]+'天 '+rate+'%</span>';
+    ranking.appendChild(row);
+  });
 }
 
 // INIT
