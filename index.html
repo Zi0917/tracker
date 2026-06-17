@@ -212,6 +212,12 @@ body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--text
     <div class="nav-label">統計</div>
     <div class="nav-item" onclick="showPage('stats')"><span class="nav-icon">◈</span> 數據統計</div>
   </div>
+  <div class="nav-section">
+    <div class="nav-label">備份</div>
+    <div class="nav-item" onclick="exportBackup()"><span class="nav-icon">⇩</span> 匯出備份</div>
+    <div class="nav-item" onclick="document.getElementById('backup-file-input').click()"><span class="nav-icon">⇧</span> 匯入備份</div>
+    <input type="file" id="backup-file-input" accept=".json" style="display:none" onchange="importBackup(event)">
+  </div>
   <div class="sidebar-bottom">
     <div class="concert-countdown">
       <div style="background:var(--bg4);border:1px solid var(--border2);border-radius:10px;padding:14px 12px;text-align:center;">
@@ -543,6 +549,65 @@ function dateKey(d){
 }
 function getStorage(){ try{return JSON.parse(localStorage.getItem('tracker166')||'{}')}catch(e){return{}} }
 function setStorage(d){ try{localStorage.setItem('tracker166',JSON.stringify(d))}catch(e){} }
+
+// ── 備份：匯出 / 匯入 ──────────────────────────────
+const BACKUP_KEYS = ['tracker166','plan_start_date','todos','inspires','checklist_order','motto_today','motto_invest','motto_korean'];
+
+function exportBackup(){
+  const data = {};
+  BACKUP_KEYS.forEach(key => {
+    const val = localStorage.getItem(key);
+    if (val !== null) data[key] = val;
+  });
+  const payload = {
+    app: 'tracker166',
+    exportedAt: new Date().toISOString(),
+    data: data
+  };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const d = new Date();
+  const stamp = `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`;
+  a.href = url;
+  a.download = `166天衝刺_備份_${stamp}.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  showToast('備份已下載，請保存好這個檔案');
+}
+
+function importBackup(event){
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e){
+    try {
+      const payload = JSON.parse(e.target.result);
+      if (!payload || !payload.data || payload.app !== 'tracker166') {
+        showToast('這不是有效的備份檔案');
+        event.target.value = '';
+        return;
+      }
+      if (!confirm('匯入備份將覆蓋目前裝置上的所有打卡紀錄，確定要繼續嗎？')) {
+        event.target.value = '';
+        return;
+      }
+      BACKUP_KEYS.forEach(key => {
+        if (payload.data[key] !== undefined) {
+          localStorage.setItem(key, payload.data[key]);
+        }
+      });
+      showToast('匯入成功，正在重新載入...');
+      setTimeout(() => location.reload(), 900);
+    } catch(err) {
+      showToast('備份檔案讀取失敗，請確認檔案是否正確');
+    }
+    event.target.value = '';
+  };
+  reader.readAsText(file);
+}
 
 function loadToday(){
   const data=getStorage(), k=todayKey(), today=data[k]||{};
